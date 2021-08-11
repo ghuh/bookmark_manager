@@ -1,5 +1,10 @@
+# Enable cargo build --fail-on-warnings
+# https://www.reddit.com/r/rust/comments/8oz7md/make_cargo_fail_on_warning/e087nj8?utm_source=share&utm_medium=web2x&context=3
+[features]
+fail-on-warnings = []
+
 [package]
-name = "bookmark_manager"
+name = "bm"
 version = "0.1.0"
 edition = "2018"
 

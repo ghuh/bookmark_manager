@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "bookmark_manager"
+name = "bm"
 version = "0.1.0"
