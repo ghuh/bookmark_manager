@@ -42,6 +42,7 @@ fn add(add_opts: &Add, csv: &String) -> Result<()> {
         .open(&csv)
         .unwrap();
 
+    // Prevent duplicate bookmarks
     if url_exists(add_opts.url.as_str(), csv)? {
         exit_error(format!("{} has already been book marked", add_opts.url).as_str());
     }
