@@ -4,7 +4,7 @@ use clap::Clap;
 #[clap(name = "bm", about = "Bookmark Manager CLI")]
 pub struct Opts {
     #[clap(subcommand)]
-    cmd: Command,
+    pub cmd: Command,
 }
 
 // subcommands: https://github.com/TeXitoi/structopt/blob/master/examples/enum_tuple.rs
@@ -23,7 +23,7 @@ pub struct Add {
     pub description: String,
 
     #[clap(short, long = "tag")]
-    tags: Vec<String>,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clap)]
@@ -31,5 +31,5 @@ pub struct Search {
     pub query: String,
 
     #[clap(short, long = "tag")]
-    tags: Vec<String>,
+    pub tags: Vec<String>,
 }

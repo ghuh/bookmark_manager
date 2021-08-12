@@ -14,6 +14,10 @@ This has several advantages:
 
 The intention is that the CSV file is stored in Git/SCM and it can be synced between devices using Git/SCM.
 
+### Details
+
+The "CSV" file is actually `|` separated with 3 columns: URL, DESCRIPTION, and TAGS.  The TAGS column contains a comma separated list.
+
 ## Installing
 
 TODO from brew
