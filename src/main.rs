@@ -11,7 +11,7 @@ const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 
 fn main() {
     let opt = config::Opts::parse();
-    let csv = env::var(ENV_CSV).expect(&*format!("Environmental variable {}", ENV_CSV));
+    let csv = env::var(ENV_CSV).expect(&*format!("Environmental variable {} must be set", ENV_CSV));
 
     println!("Options {:?}", opt);
     println!("ENV {:?}", csv);

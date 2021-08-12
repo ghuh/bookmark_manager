@@ -7,7 +7,8 @@ pub struct Opts {
     cmd: Command,
 }
 
-// https://github.com/TeXitoi/structopt/blob/master/examples/enum_tuple.rs
+// subcommands: https://github.com/TeXitoi/structopt/blob/master/examples/enum_tuple.rs
+// aliases: https://github.com/TeXitoi/structopt/blob/master/examples/subcommand_aliases.rs
 #[derive(Debug, Clap)]
 pub enum Command {
     #[clap(name = "add", alias = "a")]
