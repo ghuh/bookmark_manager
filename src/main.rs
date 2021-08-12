@@ -9,7 +9,7 @@ use anyhow::{ensure, Result, Context};
 use config::{Command, Add, Search};
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufRead};
-use ansi_term::Colour::Red;
+use ansi_term::Colour::{Red, Green};
 use regex::Regex;
 
 mod config;
@@ -49,6 +49,8 @@ fn add(add_opts: &Add, csv: &String) -> Result<()> {
     }
 
     writeln!(f, "{}|{}|{}", add_opts.url, add_opts.description, add_opts.tags.join(",")).context("Could not add bookmark")?;
+
+    println!("{}", Green.paint("Bookmark added"));
 
     Ok(())
 }
