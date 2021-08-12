@@ -5,8 +5,10 @@
 use std::env;
 use std::path::Path;
 use clap::Clap;
-use anyhow::{ensure, Result};
+use anyhow::{ensure, Result, Context};
 use config::{Command, Add, Search};
+use std::fs::File;
+use std::io::{BufReader, BufRead};
 
 mod config;
 
@@ -30,10 +32,11 @@ fn main() -> Result<()> {
 fn add(add_opts: &Add, csv: &String) {}
 
 fn search(search_opts: &Search, csv: &String) -> Result<()> {
-    let content = std::fs::read_to_string(&csv)
-        .expect("Could not read CSV file");
+    let f = File::open(&csv).context("Could not open CSV file")?;
+    let reader = BufReader::new(f);
 
-    for line in content.lines() {
+    for line_result in reader.lines() {
+        let line = line_result.context("Could not read line from CSV")?;
         let line_parts = line.split("|").collect::<Vec<&str>>();
         ensure!(line_parts.len() == 3, "CSV file has more than 3 columns");
 
