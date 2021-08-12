@@ -5,6 +5,7 @@
 use std::{env, process, io::Write};
 use std::path::Path;
 use clap::Clap;
+use validator::Validate;
 use anyhow::{ensure, Result, Context};
 use config::{Command, Add, Search};
 use std::fs::{File, OpenOptions};
@@ -37,21 +38,24 @@ fn exit_error(msg: &str) {
 }
 
 fn add(add_opts: &Add, csv: &String) -> Result<()> {
-    let mut f = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(&csv)
-        .unwrap();
+    // Make sure Url is valid
+    add_opts.validate()?;
 
     // Prevent duplicate bookmarks
     if url_exists(add_opts.url.as_str(), csv)? {
         exit_error(format!("{} has already been book marked", add_opts.url).as_str());
     }
 
+    // Append bookmark to file
+    let mut f = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(&csv)
+        .unwrap();
     writeln!(f, "{}|{}|{}", add_opts.url, add_opts.description, add_opts.tags.join(",")).context("Could not add bookmark")?;
 
+    // Success
     println!("{}", Green.paint("Bookmark added"));
-
     Ok(())
 }
 

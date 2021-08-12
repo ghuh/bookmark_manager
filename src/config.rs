@@ -1,4 +1,5 @@
 use clap::Clap;
+use validator::Validate;
 
 #[derive(Debug, Clap)]
 #[clap(name = "bm", about = "Bookmark Manager CLI")]
@@ -17,8 +18,9 @@ pub enum Command {
     Search(Search),
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, Clap, Validate)]
 pub struct Add {
+    #[validate(url)]
     pub url: String,
     pub description: String,
 

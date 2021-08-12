@@ -59,6 +59,7 @@ bm help
 bm help add
 bm a|add <URL> <DESCRIPTION>
 
+# URLs are validated and must begin with http(s)
 bm a https://www.google.com "Google search engine" -t Search --tag Google
 bm add https://www.facebook.com "Time sink"
 ```
