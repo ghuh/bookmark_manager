@@ -93,6 +93,7 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         let tags = tags_all.split(",").collect::<Vec<&str>>();
 
         // Make sure the line has all tags
+        // https://stackoverflow.com/a/64227550
         if !search_opts.tags.iter().all(|tag| tags.contains(&&**tag)) {
             continue;
         }
