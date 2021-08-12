@@ -47,6 +47,8 @@ or
 BOOKMARK_MANAGER_CSV=<path> bm ...
 ```
 
+Tags are just a way to organize bookmarks.
+
 ### Help
 
 ```bash
@@ -62,6 +64,9 @@ bm a|add <URL> <DESCRIPTION>
 # URLs are validated and must begin with http(s)
 bm a https://www.google.com "Google search engine" -t Search --tag Google
 bm add https://www.facebook.com "Time sink"
+
+# By default, if BOOKMARK_MANAGER_CSV is in a git repo. A commit will be made after adding a new bookmark. --no-commit to turn off
+bm add https://github.com "Source code" --no-commit
 ```
 
 ### Search bookmark
