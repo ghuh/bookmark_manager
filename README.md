@@ -43,9 +43,35 @@ or
 BOOKMARK_MANAGER_CSV=<path> bm ...
 ```
 
-TODO Give basic CLI options here. Explain <Command> double clicking URL
+### Help
 
-For a complete usage, run `bm help`
+```bash
+bm help
+```
+
+### Add bookmark
+
+```bash
+bm help add
+bm a|add <URL> <DESCRIPTION>
+
+bm a https://www.google.com "Google search engine" -t Search --tag Google
+bm add https://www.facebook.com "Time sink"
+```
+
+### Search bookmark
+
+```bash
+bm help add
+bm s|search <REGEX>
+
+bm search "search engine"
+
+# Tags are like "and" queries
+bm s google --tag Search
+```
+
+On macOS, hold down the command key and double-click on the URL to open it in your default browser.
 
 ## Migrating from browser based bookmark managers
 
