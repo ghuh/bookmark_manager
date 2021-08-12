@@ -10,6 +10,7 @@ use config::{Command, Add, Search};
 use std::fs::{File, OpenOptions};
 use std::io::{BufReader, BufRead};
 use ansi_term::Colour::Red;
+use regex::Regex;
 
 mod config;
 
@@ -76,6 +77,8 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
     let f = File::open(&csv).context("Could not open CSV file")?;
     let reader = BufReader::new(f);
 
+    let re = Regex::new(search_opts.regex.as_str()).context("Invalid REGEX")?;
+
     for line_result in reader.lines() {
         let line = line_result.context("Could not read line from CSV")?;
         let line_parts = line.split("|").collect::<Vec<&str>>();
@@ -92,7 +95,7 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
             continue;
         }
 
-        if url.contains(&search_opts.query) || description.contains(&search_opts.query) {
+        if re.is_match(url) || re.is_match(description) {
             println!("{}", line);
         }
     }

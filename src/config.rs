@@ -28,7 +28,7 @@ pub struct Add {
 
 #[derive(Debug, Clap)]
 pub struct Search {
-    pub query: String,
+    pub regex: String,
 
     #[clap(short, long = "tag")]
     pub tags: Vec<String>,
