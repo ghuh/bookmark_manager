@@ -38,7 +38,7 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
     for line_result in reader.lines() {
         let line = line_result.context("Could not read line from CSV")?;
         let line_parts = line.split("|").collect::<Vec<&str>>();
-        ensure!(line_parts.len() == 3, "CSV file has more than 3 columns");
+        ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
 
         let url = line_parts[0];
         let description = line_parts[1];
@@ -52,7 +52,7 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         }
 
         if url.contains(&search_opts.query) || description.contains(&search_opts.query) {
-            print!("{}", line);
+            println!("{}", line);
         }
     }
 
