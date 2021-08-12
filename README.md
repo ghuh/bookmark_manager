@@ -86,7 +86,7 @@ Instructions on how to convert your existing bookmarks.
 From a [Chrome HTML export file](https://support.google.com/chrome/answer/96816?hl=en):
 
 ```bash
-perl -lne 'BEGIN{my @tags=(); print "URL|DESCRIPTION|TAGS"} if (/HREF="([^"]*)"[^>]*>([^<]*)</) {my $url=$1; my $d=$2; $d =~ s/\|/-/; print "$url|$d|".join(",", @tags) }; push(@tags, $1) if />([^<]*)<\/H3/; pop(@tags) if /<\/DL>/' 2021_07_22_Chrome.html > bookmarks.csv
+perl -lne 'BEGIN{my @tags=(); print "URL|DESCRIPTION|TAGS"} if (/HREF="([^"]*)"[^>]*>([^<]*)</) {my $url=$1; my $d=$2; $d =~ s/\|/-/g; print "$url|$d|".join(",", @tags) }; push(@tags, $1) if />([^<]*)<\/H3/; pop(@tags) if /<\/DL>/' 2021_07_22_Chrome.html > bookmarks.csv
 ```
 
 ## Development
