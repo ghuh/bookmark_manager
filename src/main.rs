@@ -19,13 +19,14 @@ mod config;
 mod format_output;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
+const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
 
 fn main() -> Result<()> {
     let opt = config::Opts::parse();
 
     let csv = env::var(ENV_CSV)
         .expect(&*format!("Environmental variable {} must be set", ENV_CSV));
-    ensure!(Path::new(csv.as_str()).exists(), "CSV file does not exist");
+    create_csv(csv.as_str())?;
 
     match opt.cmd {
         Command::Add(add_opts) => add(&add_opts, &csv)?,
@@ -33,6 +34,22 @@ fn main() -> Result<()> {
     }
 
     Ok(())
+}
+
+/// If the CSV already exists, do nothing.  Otherwise create it with headers
+fn create_csv(csv_path: &str) -> Result<()> {
+    let path = Path::new(csv_path);
+    if !path.exists() {
+        let mut file = File::create(path).context("Couldn't create CSV file")?;
+        writeln!(file, "{}", ORDERED_HEADERS.join("|")).context("Couldn't write headers to new CSV file")?;
+        print_success("CSV file created")
+    }
+
+    Ok(())
+}
+
+fn print_success(msg: &str) {
+    println!("{}", Green.paint(msg));
 }
 
 fn exit_error(msg: &str) {

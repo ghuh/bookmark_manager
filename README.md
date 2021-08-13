@@ -14,6 +14,10 @@ This has several advantages:
 
 The intention is that the CSV file is stored in Git/SCM and it can be synced between devices using Git/SCM.
 
+### Tags
+
+Tags are just a way to organize bookmarks.  Like labels in Gmail.
+
 ### Details
 
 The "CSV" file is actually `|` separated with 3 columns: URL, DESCRIPTION, and TAGS.  The TAGS column contains a comma separated list.
@@ -47,7 +51,7 @@ or
 BOOKMARK_MANAGER_CSV=<path> bm ...
 ```
 
-Tags are just a way to organize bookmarks.
+The CSV will be created if it does not exist at the given path.
 
 ### Help
 
