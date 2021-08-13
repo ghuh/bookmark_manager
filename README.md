@@ -75,10 +75,14 @@ bm add https://github.com "Source code" --no-commit
 bm help add
 bm s|search <REGEX>
 
+# Search with only regex, no tags
 bm search "search engine"
 
 # Tags are like "and" queries
 bm s google --tag Search
+
+# Search with only tags, no regex
+bm s -t Search
 ```
 
 On macOS, hold down the command key and double-click on the URL to open it in your default browser.
