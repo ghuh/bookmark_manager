@@ -1,5 +1,5 @@
 use clap::Clap;
-use validator::Validate;
+use validator::{Validate, ValidationError};
 
 #[derive(Debug, Clap)]
 #[clap(name = "bm", about = "Bookmark Manager CLI")]
@@ -24,14 +24,16 @@ pub enum Command {
 #[derive(Debug, Clap, Validate)]
 pub struct Add {
     /// URL to bookmark
-    #[validate(url)]
+    #[validate(url, custom = "validate_no_pipe")]
     pub url: String,
 
     /// Description of the URL
+    #[validate(custom = "validate_no_pipe")]
     pub description: String,
 
     /// Tags to group bookmarks
     #[clap(short, long = "tag")]
+    #[validate(custom = "validate_no_pipe_vec")]
     pub tags: Vec<String>,
 
     // https://github.com/TeXitoi/structopt/blob/master/examples/negative_flag.rs
@@ -48,4 +50,20 @@ pub struct Search {
     /// Only apply REGEX to bookmarks with the given tags (can be none)
     #[clap(short, long = "tag")]
     pub tags: Vec<String>,
+}
+
+fn validate_no_pipe_vec(values: &Vec<String>) -> std::result::Result<(), ValidationError> {
+    for val in values {
+        validate_no_pipe(val)?
+    }
+
+    Ok(())
+}
+
+fn validate_no_pipe(val: &str) -> std::result::Result<(), ValidationError> {
+    if val.contains("|") {
+        return Err(ValidationError::new("contains_pipe"));
+    }
+
+    Ok(())
 }
