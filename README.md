@@ -20,7 +20,7 @@ The "CSV" file is actually `|` separated with 3 columns: URL, DESCRIPTION, and T
 
 ## Installing
 
-TODO from brew
+TODO [Create brew formula](https://docs.brew.sh/Adding-Software-to-Homebrew) and include install instructions here
 
 ### From source
 
