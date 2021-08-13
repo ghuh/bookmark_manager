@@ -1,8 +1,13 @@
 // Reference doc: https://rust-cli.github.io/book/tutorial/testing.html
+// Output print statements while running test: `cargo test -- --nocapture`
+//   https://medium.com/@ericdreichert/how-to-print-during-rust-tests-619bdc7ccebc
 
-use assert_cmd::prelude::*; // Add methods on commands
-use predicates::prelude::*; // Used for writing assertions
-use std::process::Command; // Run programs
+use assert_cmd::prelude::*;
+// Add methods on commands
+use predicates::prelude::*;
+// Used for writing assertions
+use std::process::Command;
+// Run programs
 use anyhow::{Result, ensure};
 use tempfile::{tempdir, TempDir};
 use std::fs::File;
@@ -23,10 +28,11 @@ fn invalid_command() -> Result<()> {
 }
 
 #[test]
+/// This test also tests the add alias 'a'
 fn create_csv_with_headers_if_not_exist() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
-    cmd.arg("add").arg("https://google.com").arg("Google");
+    cmd.arg("a").arg("https://google.com").arg("Google");
     cmd.assert()
         .success()
         .stdout(predicate::str::contains("CSV file created"));
@@ -43,16 +49,82 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
 
 #[test]
 fn ignore_first_line() -> Result<()> {
-    let (_csv_dir, csv_path, mut arrange_cmd) = setup()?;
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    arrange_cmd.arg("add").arg("https://google.com").arg("Google");
-    arrange_cmd.assert().success();
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
 
-    let mut sut_cmd = setup_cmd(&csv_path)?;
-    sut_cmd.arg("search").arg("URL");
+    cmd.arg("search").arg("URL");
 
-    sut_cmd.assert().success().stdout(predicate::eq(""));
+    cmd.assert().success().stdout(predicate::str::is_empty());
+
+    Ok(())
+}
+
+#[test]
+fn single_word_match() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+
+    // Case insensitive search
+    cmd.arg("search").arg("google");
+
+    test_count_matches(&mut cmd, 1)?;
+
+    Ok(())
+}
+
+#[test]
+fn regex_match() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+
+    // Note that is should only match URL and description, not tags
+    cmd.arg("search").arg("S.arch");
+
+    test_count_matches(&mut cmd, 2)?;
+
+    Ok(())
+}
+
+#[test]
+fn search_alias_s() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+
+    // Note that is should only match URL and description, not tags
+    cmd.arg("s").arg("Engine");
+
+    test_count_matches(&mut cmd, 2)?;
+
+    Ok(())
+}
+
+#[test]
+fn multi_word_match() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+
+    // Case insensitive search that only matches the two words together
+    cmd.arg("search").arg("Search Engine");
+
+    test_count_matches(&mut cmd, 1)?;
 
     Ok(())
 }
@@ -77,4 +149,39 @@ fn setup_cmd(csv_path: &PathBuf) -> Result<Command> {
     cmd.env("BOOKMARK_MANAGER_CSV", csv_path.to_str().unwrap());
 
     Ok(cmd)
+}
+
+/// Use the program to add a bookmark.
+/// This is useful for setting up for a search test.
+fn setup_add(csv_path: &PathBuf, url: &str, description: &str, tags: Option<Vec<&str>>) -> Result<()> {
+    let mut cmd = setup_cmd(csv_path)?;
+
+    cmd.arg("add")
+        .arg(url)
+        .arg(description);
+
+    if let Some(tags) = tags {
+        for tag in tags {
+            cmd.arg("--tag")
+                .arg(tag);
+        }
+    }
+
+    cmd.assert().success();
+
+    Ok(())
+}
+
+fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<()> {
+    let assert = cmd.assert().success();
+
+    // https://stackoverflow.com/questions/19076719/how-do-i-convert-a-vector-of-bytes-u8-to-a-string
+    let stdout = std::str::from_utf8(&*assert.get_output().stdout).unwrap();
+
+    let num_matches = &stdout.lines().count();
+
+    ensure!(num_matches == &expected_num_matches,
+        "Unexpected number of matches [{}]: {}", num_matches, stdout);
+
+    Ok(())
 }

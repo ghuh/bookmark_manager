@@ -80,6 +80,7 @@ bm help add
 bm s|search <REGEX>
 
 # Search with only regex, no tags
+# Note that single word seaches are case insensitive, but multi-word queries are not
 bm search "search engine"
 
 # Tags are like "and" queries
