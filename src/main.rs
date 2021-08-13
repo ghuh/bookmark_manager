@@ -11,11 +11,12 @@ use validator::Validate;
 use anyhow::{ensure, Result, Context};
 use ansi_term::Colour::{Red, Green, Blue};
 use regex::Regex;
-use tabwriter::TabWriter;
 
 use config::{Command, Add, Search};
+use format_output::FormatOutput;
 
 mod config;
+mod format_output;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 
@@ -93,7 +94,7 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         None => None
     };
 
-    let mut tw = TabWriter::new(vec![]);
+    let mut out = FormatOutput::new();
 
     for line_result in reader.lines() {
         let line = line_result.context("Could not read line from CSV")?;
@@ -117,28 +118,40 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
         // If there are tags, they matched. Then, if there is a regex, it must match as well
         if let Some(regex) = &re {
-            let (url_is_match, url) = wrap_matches(regex, url);
-            let (desc_is_match, description) = wrap_matches(regex, description);
+            let (url_is_match, url, url_length) = wrap_matches(regex, url);
+            let (desc_is_match, description, desc_length) = wrap_matches(regex, description);
 
             if url_is_match || desc_is_match {
-                writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags.join(" | "))?;
+                out.add_line(
+                    url,
+                    url_length,
+                    description,
+                    desc_length,
+                    &tags,
+                );
             }
         }
         // There is no regex, there are tags and they matched
         else {
-            writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags.join(" | "))?;
+            out.add_line(
+                String::from(url),
+                url.chars().count(),
+                String::from(description),
+                description.chars().count(),
+                &tags,
+            );
         }
     }
 
-    tw.flush().context("Could not generate results output")?;
-    let written = String::from_utf8(tw.into_inner().unwrap()).unwrap();
-    println!("{}", &written);
+    out.print();
 
     Ok(())
 }
 
 // https://stackoverflow.com/a/56923739
-fn wrap_matches(re: &Regex, text: &str) -> (bool, String) {
+/// Return if the regex was matched, the display string which will include any highlighting,
+/// and the number of characters in the original string.
+fn wrap_matches(re: &Regex, text: &str) -> (bool, String, usize) {
     let mut found: bool = false;
     let mut out: String = String::new();
 
@@ -167,5 +180,5 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, String) {
         out.push_str(&text[last..])
     }
 
-    (found, out)
+    (found, out, text.chars().count())
 }
