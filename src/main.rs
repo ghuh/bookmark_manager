@@ -5,7 +5,7 @@
 use std::{env, process};
 use std::path::Path;
 use std::fs::{File, OpenOptions};
-use std::io::{Write, BufReader, BufRead};
+use std::io::Write;
 use clap::Clap;
 use validator::Validate;
 use anyhow::{ensure, Result, Context};
@@ -85,17 +85,10 @@ fn add(add_opts: &Add, csv: &String) -> Result<()> {
 
 /// Check if URL already exists
 fn url_exists(url: &str, csv: &String) -> Result<bool> {
-    let f = File::open(&csv).context("Could not open CSV file")?;
-    let reader = BufReader::new(f);
+    let reader = CsvLineReader::new(csv)?;
 
-    for line_result in reader.lines() {
-        let line = line_result.context("Could not read line from CSV")?;
-        let line_parts = line.split("|").collect::<Vec<&str>>();
-        ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
-
-        let line_url = line_parts[0];
-
-        if line_url == url {
+    for line in reader {
+        if line?.url == url {
             return Ok(true);
         }
     }
