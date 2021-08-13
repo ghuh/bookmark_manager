@@ -41,14 +41,17 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
 
 /// Setup the test environment with a temporary CSV file.
 /// If contents are provided, a header will be prepended and the CSV file will be populated.
-fn setup(csv_contents: Option<String>) -> Result<(TempDir, PathBuf, Command)> {
+fn setup(csv_contents: Option<CsvContents>) -> Result<(TempDir, PathBuf, Command)> {
     let dir = tempdir()?;
     let csv_path = dir.path().join("tmp.csv");
 
     if let Some(contents) = csv_contents {
         let mut file = File::create(&csv_path.as_path()).context("Couldn't create CSV file")?;
         writeln!(file, "{}", HEADER_ROW).context("Couldn't write headers to new CSV file")?;
-        writeln!(file, "{}", contents).context("Couldn't write contents to new CSV file")?;
+        for row in contents.rows {
+            writeln!(file, "{}|{}|{}", row.url, row.description, row.tags.join(","))
+                .context("Couldn't write contents to new CSV file")?;
+        }
     }
 
     let mut cmd = Command::cargo_bin("bm")?;
@@ -56,4 +59,24 @@ fn setup(csv_contents: Option<String>) -> Result<(TempDir, PathBuf, Command)> {
     cmd.env("BOOKMARK_MANAGER_CSV", csv_path.to_str().unwrap());
 
     Ok((dir, csv_path, cmd))
+}
+
+struct CsvContents {
+    rows: Vec<Row>,
+}
+
+struct Row {
+    url: String,
+    description: String,
+    tags: Vec<String>,
+}
+
+impl CsvContents {
+    fn new() -> Self {
+        Self { rows: Vec::new() }
+    }
+
+    fn add(&mut self, url: String, description: String, tags: Vec<String>) {
+        self.rows.push( Row { url, description, tags } );
+    }
 }
