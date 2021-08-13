@@ -113,7 +113,14 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
     let mut out = FormatOutput::new();
 
+    let mut first_line = true;
     for line_result in reader.lines() {
+        // Skip headers
+        if first_line {
+            first_line = false;
+            continue;
+        }
+
         let line = line_result.context("Could not read line from CSV")?;
         let line_parts = line.split("|").collect::<Vec<&str>>();
         ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
