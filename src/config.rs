@@ -42,10 +42,10 @@ pub struct Add {
 
 #[derive(Debug, Clap)]
 pub struct Search {
-    /// Perl style REGEX to run against bookmark URL and description
-    pub regex: String,
+    /// Perl style REGEX to run against bookmark URL and description.  Omit to do tags only search.
+    pub regex: Option<String>,
 
-    /// Only apply REGEX to bookmarks with the given tags
+    /// Only apply REGEX to bookmarks with the given tags (can be none)
     #[clap(short, long = "tag")]
     pub tags: Vec<String>,
 }

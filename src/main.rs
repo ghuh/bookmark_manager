@@ -80,10 +80,16 @@ fn url_exists(url: &str, csv: &String) -> Result<bool> {
 }
 
 fn search(search_opts: &Search, csv: &String) -> Result<()> {
+    // Make sure either REGEX or at least one tag
+    ensure!(search_opts.regex.is_some() || !search_opts.tags.is_empty(), "Either a REGEX or a tag is required");
+
     let f = File::open(&csv).context("Could not open CSV file")?;
     let reader = BufReader::new(f);
 
-    let re = Regex::new(search_opts.regex.as_str()).context("Invalid REGEX")?;
+    let re = match &search_opts.regex {
+        Some(regex) => Some(Regex::new(regex.as_str()).context("Invalid REGEX")?),
+        None => None
+    };
 
     for line_result in reader.lines() {
         let line = line_result.context("Could not read line from CSV")?;
@@ -102,7 +108,23 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
             continue;
         }
 
-        if re.is_match(url) || re.is_match(description) {
+        // If there are tags, they matched. Then, if there is a regex, it must match as well
+        if let Some(regex) = &re {
+            let url_matches = Some(regex.find_iter(&url));
+            let desc_matches = Some(regex.find_iter(&description));
+
+            // https://stackoverflow.com/a/45761619
+            let url_is_match = url_matches.is_some() && url_matches.unwrap().peekable().peek().is_some();
+            let desc_is_match = desc_matches.is_some() && desc_matches.unwrap().peekable().peek().is_some();
+
+            if url_is_match || desc_is_match {
+                // TODO print with highlighting
+                println!("{}", line);
+            }
+        }
+        // There is no regex, there are tags and they matched
+        else {
+            // TODO format print, but no highlighting necessary
             println!("{}", line);
         }
     }
