@@ -32,7 +32,7 @@ Requires [installing Rust](https://www.rust-lang.org/tools/install).
 
 ```bash
 # Installs to ~/.cargo/bin which should be in your path if you installed Rust according to the standard instructions.
-cargo install  --features=fail-on-warnings --path .
+cargo install --features=fail-on-warnings --path .
 ```
 
 ## Usage
@@ -126,7 +126,8 @@ cargo build --release --features=fail-on-warnings
 ### Test
 
 ```bash
-cargo test
+# Runs unit and integration tests
+cargo test --features=fail-on-warnings
 ```
 
 ### Run
