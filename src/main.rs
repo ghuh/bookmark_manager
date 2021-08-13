@@ -14,10 +14,12 @@ use regex::Regex;
 
 use config::{Command, Add, Search};
 use format_output::FormatOutput;
+use csv::CsvLineReader;
 
 mod config;
 mod format_output;
 mod tags;
+mod csv;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
@@ -105,9 +107,6 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
     ensure!(search_opts.regex.is_some() || !search_opts.tags.is_empty(), "Either a REGEX or a tag is required");
 
-    let f = File::open(&csv).context("Could not open CSV file")?;
-    let reader = BufReader::new(f);
-
     let re = match &search_opts.regex {
         Some(regex) => Some(Regex::new(regex.as_str()).context("Invalid REGEX")?),
         None => None
@@ -115,23 +114,14 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
     let mut out = FormatOutput::new();
 
-    let mut first_line = true;
-    for line_result in reader.lines() {
-        // Skip headers
-        if first_line {
-            first_line = false;
-            continue;
-        }
+    let reader = CsvLineReader::new(csv)?;
 
-        let line = line_result.context("Could not read line from CSV")?;
-        let line_parts = line.split("|").collect::<Vec<&str>>();
-        ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
+    for line in reader {
+        let line = line?;
+        let url = line.url.as_str();
+        let description = line.description.as_str();
 
-        let url = line_parts[0];
-        let description = line_parts[1];
-        let tags_all = line_parts[2];
-
-        let mut tags = tags_all.split(",").map(|tag| tag.to_lowercase()).collect::<Vec<String>>();
+        let mut tags = line.tags.iter().map(|tag| tag.to_lowercase()).collect::<Vec<String>>();
 
         // Sort tags case insensitively for output
         tags.sort();
