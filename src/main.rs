@@ -67,7 +67,7 @@ fn add(add_opts: &Add, csv: &String) -> Result<()> {
 
     // Prevent duplicate bookmarks
     if url_exists(add_opts.url.as_str(), csv)? {
-        exit_error(format!("{} has already been book marked", add_opts.url).as_str());
+        exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
     }
 
     // Append bookmark to file

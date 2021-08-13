@@ -47,6 +47,19 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
 }
 
 #[test]
+fn no_duplicate_urls() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    cmd.arg("a").arg("https://google.com").arg("Google");
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("has already been bookmarked"));
+
+    Ok(())
+}
+
+#[test]
 fn validate_fails_for_pipe_in_description() -> Result<()> {
     let (_csv_dir, _csv_path, mut cmd) = setup()?;
 
