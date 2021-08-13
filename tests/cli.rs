@@ -21,8 +21,7 @@ fn invalid_command() -> Result<()> {
     let (_csv_dir, _csv_path, mut cmd) = setup()?;
 
     cmd.arg("stuff");
-    cmd.assert()
-        .failure();
+    cmd.assert().failure();
 
     Ok(())
 }
@@ -43,6 +42,16 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
 
     // Need to trim to remove new line at the end
     ensure!(first_line.trim() == HEADER_ROW, "Program didn't create header");
+
+    Ok(())
+}
+
+#[test]
+fn validate_fails_for_pipe_in_description() -> Result<()> {
+    let (_csv_dir, _csv_path, mut cmd) = setup()?;
+
+    cmd.arg("a").arg("https://google.com").arg("Goo|gle");
+    cmd.assert().failure();
 
     Ok(())
 }
