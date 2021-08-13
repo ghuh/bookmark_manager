@@ -84,6 +84,7 @@ bm s|search <REGEX>
 bm search "search engine"
 
 # Tags are like "and" queries
+# Tags are always case insensitive
 bm s google --tag Search
 
 # Search with only tags, no regex
