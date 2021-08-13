@@ -148,6 +148,27 @@ fn tags_only_query() -> Result<()> {
     Ok(())
 }
 
+#[test]
+/// Also tests tags are case insensitive
+fn multi_tag_query() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo match me Engine", Some(vec!["Search", "Engine"]))?;
+    setup_add(&csv_path, "https://duckduckgo.com/", "Privacy match me search Engine", Some(vec!["Search","Engine"]))?;
+
+    // Case insensitive search that only matches the two words together
+    cmd.arg("search").arg("match me")
+        .arg("--tag").arg("Search")
+        .arg("-t").arg("engine");
+
+    test_count_matches(&mut cmd, 2)?;
+
+    Ok(())
+}
+
 /// Setup the test environment with a temporary CSV file.
 /// To populate the CSV with contents, use "add" command.
 ///
