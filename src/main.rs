@@ -2,16 +2,18 @@
 // https://www.reddit.com/r/rust/comments/8oz7md/make_cargo_fail_on_warning/e087nj8?utm_source=share&utm_medium=web2x&context=3
 #![cfg_attr(feature = "fail-on-warnings", deny(warnings))]
 
-use std::{env, process, io::Write};
+use std::{env, process};
 use std::path::Path;
+use std::fs::{File, OpenOptions};
+use std::io::{Write, BufReader, BufRead};
 use clap::Clap;
 use validator::Validate;
 use anyhow::{ensure, Result, Context};
-use config::{Command, Add, Search};
-use std::fs::{File, OpenOptions};
-use std::io::{BufReader, BufRead};
 use ansi_term::Colour::{Red, Green};
 use regex::Regex;
+use tabwriter::TabWriter;
+
+use config::{Command, Add, Search};
 
 mod config;
 
@@ -91,6 +93,8 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         None => None
     };
 
+    let mut tw = TabWriter::new(vec![]);
+
     for line_result in reader.lines() {
         let line = line_result.context("Could not read line from CSV")?;
         let line_parts = line.split("|").collect::<Vec<&str>>();
@@ -119,15 +123,18 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
             if url_is_match || desc_is_match {
                 // TODO print with highlighting
-                println!("{}", line);
+                writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags_all)?;
             }
         }
         // There is no regex, there are tags and they matched
         else {
-            // TODO format print, but no highlighting necessary
-            println!("{}", line);
+            writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags_all)?;
         }
     }
+
+    tw.flush().context("Could not generate results output")?;
+    let written = String::from_utf8(tw.into_inner().unwrap()).unwrap();
+    println!("{}", &written);
 
     Ok(())
 }

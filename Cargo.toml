@@ -16,3 +16,4 @@ anyhow = "1.0.42"
 ansi_term = "0.12.1"
 regex = "1.5.4"
 validator = { version = "0.14.0", features = ["derive"] }
+tabwriter = "1.2.1"
