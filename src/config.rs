@@ -19,6 +19,10 @@ pub enum Command {
     /// Search for a bookmark
     #[clap(name = "search", alias = "s")]
     Search(Search),
+
+    /// List all tags
+    #[clap(name = "tags", alias = "t")]
+    Tags(Tags)
 }
 
 #[derive(Debug, Clap, Validate)]
@@ -50,6 +54,10 @@ pub struct Search {
     /// Only apply REGEX to bookmarks with the given tags (can be none)
     #[clap(short, long = "tag")]
     pub tags: Vec<String>,
+}
+
+#[derive(Debug, Clap)]
+pub struct Tags {
 }
 
 fn validate_no_pipe_vec(values: &Vec<String>) -> std::result::Result<(), ValidationError> {

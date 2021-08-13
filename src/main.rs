@@ -17,6 +17,7 @@ use format_output::FormatOutput;
 
 mod config;
 mod format_output;
+mod tags;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
@@ -31,6 +32,7 @@ fn main() -> Result<()> {
     match opt.cmd {
         Command::Add(add_opts) => add(&add_opts, &csv)?,
         Command::Search(search_opts) => search(&search_opts, &csv)?,
+        Command::Tags(tags_opts) => tags::tags(&tags_opts, &csv)?,
     }
 
     Ok(())

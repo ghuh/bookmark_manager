@@ -14,10 +14,6 @@ This has several advantages:
 
 The intention is that the CSV file is stored in Git/SCM and it can be synced between devices using Git/SCM.
 
-### Tags
-
-Tags are just a way to organize bookmarks.  Like labels in Gmail.
-
 ### Details
 
 The "CSV" file is actually `|` separated with 3 columns: URL, DESCRIPTION, and TAGS.  The TAGS column contains a comma separated list.
@@ -92,6 +88,19 @@ bm s -t Search
 ```
 
 On macOS, hold down the command key and double-click on the URL to open it in your default browser.
+
+### Tags
+
+Tags are just a way to organize bookmarks.  Like labels in Gmail.
+
+```bash
+bm help tags
+
+# List all tags sorted one per line
+# If there are multiple of the same tag with different casing, they will be comma separated on the same line
+bm t|tags
+```
+
 
 ## Migrating from browser based bookmark managers
 
