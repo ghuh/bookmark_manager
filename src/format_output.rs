@@ -29,7 +29,7 @@ impl FormatOutput {
         url_len: usize,
         description: String,
         desc_len: usize,
-        tags: &Vec<&str>,
+        tags: &Vec<String>,
     ) {
         if url_len > self.url_max {
             self.url_max = url_len;

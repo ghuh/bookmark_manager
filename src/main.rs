@@ -129,14 +129,14 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         let description = line_parts[1];
         let tags_all = line_parts[2];
 
-        let mut tags = tags_all.split(",").collect::<Vec<&str>>();
+        let mut tags = tags_all.split(",").map(|tag| tag.to_lowercase()).collect::<Vec<String>>();
 
         // Sort tags case insensitively for output
-        tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+        tags.sort();
 
         // Make sure the line has all tags
         // https://stackoverflow.com/a/64227550
-        if !search_opts.tags.iter().all(|tag| tags.contains(&&**tag)) {
+        if !search_opts.tags.iter().all(|tag| tags.contains(&tag.to_lowercase())) {
             continue;
         }
 
