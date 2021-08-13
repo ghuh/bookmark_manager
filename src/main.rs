@@ -9,7 +9,7 @@ use std::io::{Write, BufReader, BufRead};
 use clap::Clap;
 use validator::Validate;
 use anyhow::{ensure, Result, Context};
-use ansi_term::Colour::{Red, Green};
+use ansi_term::Colour::{Red, Green, Blue};
 use regex::Regex;
 use tabwriter::TabWriter;
 
@@ -117,15 +117,10 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
         // If there are tags, they matched. Then, if there is a regex, it must match as well
         if let Some(regex) = &re {
-            let url_matches = Some(regex.find_iter(&url));
-            let desc_matches = Some(regex.find_iter(&description));
-
-            // https://stackoverflow.com/a/45761619
-            let url_is_match = url_matches.is_some() && url_matches.unwrap().peekable().peek().is_some();
-            let desc_is_match = desc_matches.is_some() && desc_matches.unwrap().peekable().peek().is_some();
+            let (url_is_match, url) = wrap_matches(regex, url);
+            let (desc_is_match, description) = wrap_matches(regex, description);
 
             if url_is_match || desc_is_match {
-                // TODO print with highlighting
                 writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags.join(" | "))?;
             }
         }
@@ -140,4 +135,37 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
     println!("{}", &written);
 
     Ok(())
+}
+
+// https://stackoverflow.com/a/56923739
+fn wrap_matches(re: &Regex, text: &str) -> (bool, String) {
+    let mut found: bool = false;
+    let mut out: String = String::new();
+
+    let mut last = 0;
+    for mat in re.find_iter(text) {
+        found = true;
+
+        let start = mat.start();
+        let end = mat.end();
+
+        // Add everything up to the match
+        if last != start {
+            out.push_str(&text[last..start]);
+        }
+
+        // Add the match
+        let colored_output = Blue.paint(&text[start..end]).to_string();
+        out.push_str(&colored_output);
+
+        last = end;
+    }
+
+    // Add any remaining text after last match
+    // This will add the entire string if no matches found
+    if last < text.len() {
+        out.push_str(&text[last..])
+    }
+
+    (found, out)
 }
