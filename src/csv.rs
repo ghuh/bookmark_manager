@@ -27,6 +27,7 @@ impl CsvLineReader {
     }
 }
 
+// https://doc.rust-lang.org/rust-by-example/trait/iter.html
 impl Iterator for CsvLineReader {
     type Item = Result<Line>;
 

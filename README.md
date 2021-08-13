@@ -99,6 +99,9 @@ bm help tags
 # List all tags sorted one per line
 # If there are multiple of the same tag with different casing, they will be comma separated on the same line
 bm t|tags
+
+# Look for a specific tag
+bm t |grep "query"
 ```
 
 

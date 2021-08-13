@@ -191,6 +191,28 @@ fn multi_tag_query() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn list_tags() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Create the file, header, and a line to search
+    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
+    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["search", "a"]))?;
+    setup_add(&csv_path, "https://yahoo.com", "Yahoo match me Engine", Some(vec!["Search", "B"]))?;
+    setup_add(&csv_path, "https://duckduckgo.com/", "Privacy match me search Engine", Some(vec!["c", "Engine"]))?;
+
+    cmd.arg("tags").assert().success()
+        .stdout(predicate::eq("\
+a
+B
+c
+Engine
+Search, search
+"));
+
+    Ok(())
+}
+
 /// Setup the test environment with a temporary CSV file.
 /// To populate the CSV with contents, use "add" command.
 ///
