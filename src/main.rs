@@ -104,7 +104,10 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
         let description = line_parts[1];
         let tags_all = line_parts[2];
 
-        let tags = tags_all.split(",").collect::<Vec<&str>>();
+        let mut tags = tags_all.split(",").collect::<Vec<&str>>();
+
+        // Sort tags case insensitively for output
+        tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
 
         // Make sure the line has all tags
         // https://stackoverflow.com/a/64227550
@@ -123,12 +126,12 @@ fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
             if url_is_match || desc_is_match {
                 // TODO print with highlighting
-                writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags_all)?;
+                writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags.join(" | "))?;
             }
         }
         // There is no regex, there are tags and they matched
         else {
-            writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags_all)?;
+            writeln!(&mut tw, "{}\t{}\t{}", &url, &description, &tags.join(" | "))?;
         }
     }
 
