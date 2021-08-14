@@ -1,5 +1,5 @@
 use anyhow::{ensure, Result, Context};
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 
 use crate::config::Search;
 use crate::csv::{Line, CsvLineReader};
@@ -12,7 +12,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
     // Only compile the regex once
     let re = match &search_opts.regex {
-        Some(regex) => Some(Regex::new(regex.as_str()).context("Invalid REGEX")?),
+        Some(regex) => Some(build_regex(regex.as_str())?),
         None => None
     };
 
@@ -29,6 +29,15 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     out.print();
 
     Ok(())
+}
+
+fn build_regex(regex: &str) -> Result<Regex> {
+    let re = RegexBuilder::new(regex)
+        .case_insensitive(true)
+        .build()
+        .context("Invalid REGEX")?;
+
+    Ok(re)
 }
 
 fn match_line(re: &Option<Regex>, search_tags: &Vec<String>, line: Line) -> Option<MatchedBookmark> {
@@ -106,7 +115,7 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, Vec<TextPart>) {
 
 #[cfg(test)]
 mod tests {
-    use crate::commands::search::match_line;
+    use crate::commands::search::{match_line, build_regex};
     use regex::Regex;
     use crate::csv::Line;
     use crate::cli_output::search_result_output::{TextPart, MatchedBookmark};
@@ -128,6 +137,21 @@ mod tests {
 
     #[test]
     fn single_word_description() {
+        let m = match_line(
+            &regex_from_str("Hi"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("Hi there"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_description(m, "Hi");
+    }
+
+    #[test]
+    fn case_insensitive_description() {
         let m = match_line(
             &regex_from_str("Hi"),
             &Vec::new(),
@@ -327,6 +351,6 @@ mod tests {
     }
 
     fn regex_from_str(regex: &str) -> Option<Regex> {
-        Some(Regex::new(regex).unwrap())
+        Some(build_regex(regex).unwrap())
     }
 }
