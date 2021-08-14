@@ -3,7 +3,7 @@ use regex::Regex;
 
 use crate::config::Search;
 use crate::csv::CsvLineReader;
-use crate::cli_output::search_result_output::{TextPart, SearchResultOutput};
+use crate::cli_output::search_result_output::{TextPart, SearchResultOutput, MatchedBookmark};
 use std::collections::HashMap;
 
 pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
@@ -39,18 +39,22 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
             if url_is_match || desc_is_match {
                 out.add_matched_bookmark(
-                    url,
-                    description,
-                    line.tags,
+                    MatchedBookmark::new(
+                        url,
+                        description,
+                        line.tags,
+                    )
                 );
             }
         }
         // There is no regex, there are tags and they matched
         else {
-            out.add_tags_only_matched_bookmark(
-                url,
-                description,
-                line.tags,
+            out.add_matched_bookmark(
+                MatchedBookmark::new_tags_only(
+                    url,
+                    description,
+                    line.tags,
+                )
             );
         }
     }
