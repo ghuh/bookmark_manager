@@ -22,7 +22,7 @@ pub enum Command {
 
     /// List all tags
     #[clap(name = "tags", alias = "t")]
-    Tags(Tags)
+    Tags(Tags),
 }
 
 #[derive(Debug, Clap, Validate)]
@@ -57,8 +57,7 @@ pub struct Search {
 }
 
 #[derive(Debug, Clap)]
-pub struct Tags {
-}
+pub struct Tags {}
 
 fn validate_no_pipe_vec(values: &Vec<String>) -> std::result::Result<(), ValidationError> {
     for val in values {
@@ -74,4 +73,59 @@ fn validate_no_pipe(val: &str) -> std::result::Result<(), ValidationError> {
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod add_tests {
+    use validator::Validate;
+
+    use crate::config::Add;
+
+    #[test]
+    fn invalid_url() {
+        let add_opts = Add {
+            url: String::from("not_a_url"),
+            description: String::from("description"),
+            tags: Vec::new(),
+            commit: true,
+        };
+
+        assert!(add_opts.validate().is_err());
+    }
+
+    #[test]
+    fn pipe_in_url() {
+        let add_opts = Add {
+            url: String::from("https://wwww.go|ogle.com"),
+            description: String::from("description"),
+            tags: Vec::new(),
+            commit: true,
+        };
+
+        assert!(add_opts.validate().is_err());
+    }
+
+    #[test]
+    fn pipe_in_description() {
+        let add_opts = Add {
+            url: String::from("https://wwww.google.com"),
+            description: String::from("descr|iption"),
+            tags: Vec::new(),
+            commit: true,
+        };
+
+        assert!(add_opts.validate().is_err());
+    }
+
+    #[test]
+    fn pipe_in_tags() {
+        let add_opts = Add {
+            url: String::from("https://wwww.google.com"),
+            description: String::from("description"),
+            tags: vec![String::from("t|ag")],
+            commit: true,
+        };
+
+        assert!(add_opts.validate().is_err());
+    }
 }
