@@ -4,6 +4,7 @@ use regex::Regex;
 use crate::config::Search;
 use crate::csv::CsvLineReader;
 use crate::cli_output::search_result_output::{TextPart, SearchResultOutput};
+use std::collections::HashMap;
 
 pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
@@ -23,16 +24,17 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
         let url = line.url.as_str();
         let description = line.description.as_str();
 
-        let mut tags = line.tags.iter().map(|tag| tag.to_lowercase()).collect::<Vec<String>>();
-
-        // Sort tags case insensitively for output
-        tags.sort();
+        let tag_lookup = line.tags.iter().map(|tag| (tag.to_lowercase(), 1)).collect::<HashMap<String, _>>();
 
         // Make sure the line has all tags
         // https://stackoverflow.com/a/64227550
-        if !search_opts.tags.iter().all(|tag| tags.contains(&tag.to_lowercase())) {
+        if !search_opts.tags.iter().all(|tag| tag_lookup.contains_key(&tag.to_lowercase())) {
             continue;
         }
+
+        // Sort tags case insensitively for output, but display in their original case
+        let mut output_tags = line.tags.clone();
+        output_tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
 
         // If there are tags, they matched. Then, if there is a regex, it must match as well
         if let Some(regex) = &re {
@@ -43,7 +45,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
                 out.add_matched_bookmark(
                     url,
                     description,
-                    tags,
+                    output_tags,
                 );
             }
         }
@@ -52,7 +54,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
             out.add_tags_only_matched_bookmark(
                 url,
                 description,
-                tags,
+                output_tags,
             );
         }
     }
