@@ -32,10 +32,6 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
             continue;
         }
 
-        // Sort tags case insensitively for output, but display in their original case
-        let mut output_tags = line.tags.clone();
-        output_tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
-
         // If there are tags, they matched. Then, if there is a regex, it must match as well
         if let Some(regex) = &re {
             let (url_is_match, url) = wrap_matches(regex, url);
@@ -45,7 +41,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
                 out.add_matched_bookmark(
                     url,
                     description,
-                    output_tags,
+                    line.tags,
                 );
             }
         }
@@ -54,7 +50,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
             out.add_tags_only_matched_bookmark(
                 url,
                 description,
-                output_tags,
+                line.tags,
             );
         }
     }

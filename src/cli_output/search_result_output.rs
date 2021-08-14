@@ -101,8 +101,11 @@ impl SearchResultOutput {
         &mut self,
         url: Vec<TextPart>,
         description: Vec<TextPart>,
-        tags: Vec<String>,
+        mut tags: Vec<String>,
     ) {
+        // Sort tags case insensitively for output, but display in their original case
+        tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+
         let matched_bookmark = MatchedBookmark {
             url,
             description,
