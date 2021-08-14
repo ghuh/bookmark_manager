@@ -1,11 +1,9 @@
-use anyhow::{Result, Context};
+use anyhow::Result;
 use validator::Validate;
-use std::io::Write;
-use std::fs::OpenOptions;
 
 use crate::output_utils::{print_success, exit_error};
 use crate::config::Add;
-use crate::csv::CsvLineReader;
+use crate::csv::{CsvLineReader, CsvLineWriter};
 
 pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     // Make sure Url is valid
@@ -17,12 +15,12 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     }
 
     // Append bookmark to file
-    let mut f = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(&csv)
-        .unwrap();
-    writeln!(f, "{}|{}|{}", add_opts.url, add_opts.description, add_opts.tags.join(",")).context("Could not add bookmark")?;
+    let mut writer = CsvLineWriter::new(csv.as_str())?;
+    writer.write_line(
+        add_opts.url.as_str(),
+        add_opts.description.as_str(),
+        &add_opts.tags,
+    )?;
 
     // Success
     print_success("Bookmark added");
