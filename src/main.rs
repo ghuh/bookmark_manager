@@ -2,24 +2,26 @@
 // https://www.reddit.com/r/rust/comments/8oz7md/make_cargo_fail_on_warning/e087nj8?utm_source=share&utm_medium=web2x&context=3
 #![cfg_attr(feature = "fail-on-warnings", deny(warnings))]
 
-use std::{env, process};
+use std::env;
 use std::path::Path;
 use std::fs::{File, OpenOptions};
 use std::io::Write;
 use clap::Clap;
 use validator::Validate;
 use anyhow::{ensure, Result, Context};
-use ansi_term::Colour::{Red, Green, Blue};
+use ansi_term::Colour::{Green, Blue};
 use regex::Regex;
 
 use config::{Command, Add, Search};
 use format_output::FormatOutput;
 use csv::CsvLineReader;
+use crate::output_utils::exit_error;
 
 mod config;
 mod format_output;
 mod csv;
 mod commands;
+mod output_utils;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
@@ -46,19 +48,10 @@ fn create_csv(csv_path: &str) -> Result<()> {
     if !path.exists() {
         let mut file = File::create(path).context("Couldn't create CSV file")?;
         writeln!(file, "{}", ORDERED_HEADERS.join("|")).context("Couldn't write headers to new CSV file")?;
-        print_success("CSV file created")
+        output_utils::print_success("CSV file created")
     }
 
     Ok(())
-}
-
-fn print_success(msg: &str) {
-    println!("{}", Green.paint(msg));
-}
-
-fn exit_error(msg: &str) {
-    eprintln!("{}", Red.paint(msg));
-    process::exit(1);
 }
 
 fn add(add_opts: &Add, csv: &String) -> Result<()> {
