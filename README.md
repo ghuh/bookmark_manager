@@ -59,7 +59,8 @@ bm help
 
 ```bash
 bm help add
-bm a|add <URL> <DESCRIPTION>
+bm add <URL> <DESCRIPTION>
+bm a <URL> <DESCRIPTION>
 
 # URLs are validated and must begin with http(s)
 bm a https://www.google.com "Google search engine" -t Search --tag Google
@@ -73,7 +74,8 @@ bm add https://github.com "Source code" --no-commit
 
 ```bash
 bm help add
-bm s|search <REGEX>
+bm search <REGEX>
+bm s <REGEX>
 
 # Search with only regex, no tags
 # The regex is case insensitive
@@ -98,7 +100,8 @@ bm help tags
 
 # List all tags sorted one per line
 # If there are multiple of the same tag with different casing, they will be comma separated on the same line
-bm t|tags
+bm tags
+bm t
 
 # Look for a specific tag
 bm t |grep "query"
