@@ -12,6 +12,12 @@ use crate::cli_output::utils::print_success;
 
 const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
 
+pub struct Line {
+    pub url: String,
+    pub description: String,
+    pub tags: Vec<String>,
+}
+
 /// If the CSV already exists, do nothing.  Otherwise create it with headers
 pub fn create_csv(csv_path: &str) -> Result<()> {
     let path = Path::new(csv_path);

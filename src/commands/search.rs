@@ -2,7 +2,7 @@ use anyhow::{ensure, Result, Context};
 use regex::Regex;
 
 use crate::config::Search;
-use crate::csv::CsvLineReader;
+use crate::csv::{Line, CsvLineReader};
 use crate::cli_output::search_result_output::{TextPart, SearchResultOutput, MatchedBookmark};
 use std::collections::HashMap;
 
@@ -10,58 +10,64 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
     ensure!(search_opts.regex.is_some() || !search_opts.tags.is_empty(), "Either a REGEX or a tag is required");
 
+    // Only compile the regex once
     let re = match &search_opts.regex {
         Some(regex) => Some(Regex::new(regex.as_str()).context("Invalid REGEX")?),
         None => None
     };
 
     let mut out = SearchResultOutput::new();
-
     let reader = CsvLineReader::new(csv)?;
 
     for line in reader {
-        let line = line?;
-        let url = line.url.as_str();
-        let description = line.description.as_str();
-
-        let tag_lookup = line.tags.iter().map(|tag| (tag.to_lowercase(), 1)).collect::<HashMap<String, _>>();
-
-        // Make sure the line has all tags
-        // https://stackoverflow.com/a/64227550
-        if !search_opts.tags.iter().all(|tag| tag_lookup.contains_key(&tag.to_lowercase())) {
-            continue;
-        }
-
-        // If there are tags, they matched. Then, if there is a regex, it must match as well
-        if let Some(regex) = &re {
-            let (url_is_match, url) = wrap_matches(regex, url);
-            let (desc_is_match, description) = wrap_matches(regex, description);
-
-            if url_is_match || desc_is_match {
-                out.add_matched_bookmark(
-                    MatchedBookmark::new(
-                        url,
-                        description,
-                        line.tags,
-                    )
-                );
-            }
-        }
-        // There is no regex, there are tags and they matched
-        else {
-            out.add_matched_bookmark(
-                MatchedBookmark::new_tags_only(
-                    url,
-                    description,
-                    line.tags,
-                )
-            );
+        if let Some(m) = match_line(&re, &search_opts.tags, line?) {
+            out.add_matched_bookmark(m);
         }
     }
 
+    // For formatting purposes the output is stored in memory until the search is complete. Print to console now
     out.print();
 
     Ok(())
+}
+
+fn match_line(re: &Option<Regex>, search_tags: &Vec<String>, line: Line) -> Option<MatchedBookmark> {
+    let url = line.url.as_str();
+    let description = line.description.as_str();
+
+    let tag_lookup = line.tags.iter().map(|tag| (tag.to_lowercase(), 1)).collect::<HashMap<String, _>>();
+
+    // Make sure the line has all tags
+    // https://stackoverflow.com/a/64227550
+    if !search_tags.iter().all(|tag| tag_lookup.contains_key(&tag.to_lowercase())) {
+        return None;
+    }
+
+    // If there are tags, they matched. Then, if there is a regex, it must match as well
+    if let Some(regex) = &re {
+        let (url_is_match, url) = wrap_matches(regex, url);
+        let (desc_is_match, description) = wrap_matches(regex, description);
+
+        if url_is_match || desc_is_match {
+            return Some(MatchedBookmark::new(
+                url,
+                description,
+                line.tags,
+            ));
+        }
+    }
+    // There is no regex, there are tags and they matched
+    else {
+        return Some(
+            MatchedBookmark::new_tags_only(
+                url,
+                description,
+                line.tags,
+            )
+        );
+    }
+
+    None
 }
 
 // https://stackoverflow.com/a/56923739

@@ -2,11 +2,7 @@ use anyhow::{Result, Context, ensure};
 use std::fs::File;
 use std::io::{BufReader, BufRead, Lines};
 
-pub struct Line {
-    pub url: String,
-    pub description: String,
-    pub tags: Vec<String>,
-}
+use super::Line;
 
 pub struct CsvLineReader {
     lines: Lines<BufReader<File>>,
