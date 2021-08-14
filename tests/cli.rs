@@ -84,6 +84,23 @@ fn ignore_first_line() -> Result<()> {
 }
 
 #[test]
+fn sort_tags() -> Result<()> {
+    let (_csv_dir, csv_path, mut cmd) = setup()?;
+
+    // Tags are out of order
+    setup_add(&csv_path, "https://google.com", "Google Search Engine", Some(vec!["c", "B", "a"]))?;
+
+    cmd.arg("search").arg("google");
+
+    cmd.assert()
+        .success()
+        // Tags are sorted case insensitively
+        .stdout(predicate::str::contains("a | B | c"));
+
+    Ok(())
+}
+
+#[test]
 fn single_word_match() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
