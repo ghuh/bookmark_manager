@@ -127,7 +127,7 @@ mod tests {
     }
 
     #[test]
-    fn single_word_match() {
+    fn single_word_description() {
         let m = match_line(
             &regex_from_str("Hi"),
             &Vec::new(),
@@ -142,7 +142,7 @@ mod tests {
     }
 
     #[test]
-    fn regex_match() {
+    fn regex_description() {
         let m = match_line(
             &regex_from_str("t.e"),
             &Vec::new(),
@@ -157,7 +157,7 @@ mod tests {
     }
 
     #[test]
-    fn multi_word_match() {
+    fn multi_word_description() {
         let m = match_line(
             &regex_from_str("more than"),
             &Vec::new(),
@@ -172,7 +172,7 @@ mod tests {
     }
 
     #[test]
-    fn url_match() {
+    fn single_word_url() { // Multi word doesn't make sense for a URL
         let m = match_line(
             &regex_from_str("google"),
             &Vec::new(),
@@ -183,19 +183,45 @@ mod tests {
             },
         );
 
-        assert!(m.is_some());
+        single_matched_url(m, "google");
+    }
+
+    #[test]
+    fn regex_url() { // Multi word doesn't make sense for a URL
+        let m = match_line(
+            &regex_from_str("g..g"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_url(m, "goog");
     }
 
     fn single_matched_description(m: Option<MatchedBookmark>, expected_text: &str) {
         assert!(m.is_some());
-        let matched_text = m.unwrap().description.iter().filter_map(
+        let matched_text = get_matched_parts(&m.unwrap().description);
+        assert_eq!(matched_text.len(), 1);
+        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+    }
+
+    fn single_matched_url(m: Option<MatchedBookmark>, expected_text: &str) {
+        assert!(m.is_some());
+        let matched_text = get_matched_parts(&m.unwrap().url);
+        assert_eq!(matched_text.len(), 1);
+        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+    }
+
+    fn get_matched_parts(parts: &Vec<TextPart>) -> Vec<TextPart> {
+        parts.iter().filter_map(
             |part| match part {
                 TextPart::MatchedText(v) => Some(TextPart::MatchedText(v.clone())),
                 _ => None,
             }
-        ).collect::<Vec<TextPart>>();
-        assert_eq!(matched_text.len(), 1);
-        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+        ).collect::<Vec<TextPart>>()
     }
 
     fn regex_from_str(regex: &str) -> Option<Regex> {
