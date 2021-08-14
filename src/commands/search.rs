@@ -187,7 +187,7 @@ mod tests {
     }
 
     #[test]
-    fn regex_url() { // Multi word doesn't make sense for a URL
+    fn regex_url() {
         let m = match_line(
             &regex_from_str("g..g"),
             &Vec::new(),
@@ -202,7 +202,7 @@ mod tests {
     }
 
     #[test]
-    fn tags_only() { // Multi word doesn't make sense for a URL
+    fn tags_only() {
         let m = match_line(
             &None,
             &vec![String::from("Tag1")],
@@ -220,7 +220,7 @@ mod tests {
     }
 
     #[test]
-    fn case_insensitive_tags() { // Multi word doesn't make sense for a URL
+    fn case_insensitive_tags() {
         let m = match_line(
             &None,
             &vec![String::from("tag1")],
@@ -238,7 +238,7 @@ mod tests {
     }
 
     #[test]
-    fn tags_and_url_match() { // Multi word doesn't make sense for a URL
+    fn tags_and_url_match() {
         let m = match_line(
             &regex_from_str("g..g"),
             &vec![String::from("tag1")],
@@ -253,7 +253,7 @@ mod tests {
     }
 
     #[test]
-    fn url_match_tags_do_not() { // Multi word doesn't make sense for a URL
+    fn url_match_tags_do_not() {
         let m = match_line(
             &regex_from_str("g..g"),
             &vec![String::from("what")],
@@ -268,7 +268,7 @@ mod tests {
     }
 
     #[test]
-    fn multi_tags() { // Multi word doesn't make sense for a URL
+    fn multiple_tags() {
         let m = match_line(
             &None,
             &vec![String::from("Tag1"), String::from("Tag2")],
