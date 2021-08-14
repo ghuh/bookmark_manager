@@ -8,11 +8,11 @@ The purpose of this project is to create a cross-platform, CLI based, web bookma
 
 This has several advantages:
 
-- It's not tied to any specific browser so it is easier to switch back and forth between Firefox and Chrome over the years.
-- Flat files are forever even if the tools built around them become deprecated so there is no concern of every losing data.
-- Flat file play nicely with Git/SCM.
+- It's not tied to any specific browser, so it is easier to switch back and forth between Firefox and Chrome over the years.
+- Flat files are forever. Even if the tools built around them become deprecated so there is no concern of every losing data.
+- Flat files play nicely with Git/SCM.
 
-The intention is that the CSV file is stored in Git/SCM and it can be synced between devices using Git/SCM.
+The intention is that the CSV file is stored in Git/SCM, and it can be synced between devices using Git/SCM.
 
 ### Details
 
@@ -122,6 +122,13 @@ perl -lne 'BEGIN{my @tags=(); print "URL|DESCRIPTION|TAGS"} if (/HREF="([^"]*)"[
 
 Requires [installing Rust](https://www.rust-lang.org/tools/install).
 
+### Test
+
+```bash
+# Runs unit and integration tests
+cargo test --features=fail-on-warnings
+```
+
 ### Build
 
 #### Development Build
@@ -137,17 +144,10 @@ cargo build
 cargo build --release --features=fail-on-warnings
 ```
 
-### Test
-
-```bash
-# Runs unit and integration tests
-cargo test --features=fail-on-warnings
-```
-
 ### Run
 
 ```bash
-cargo run
+cargo run -- add https://www.google.com "Google search engine" -t Search
 ```
 
 ## Reference
