@@ -1,7 +1,7 @@
 use anyhow::Result;
 use validator::Validate;
 
-use crate::output_utils::{print_success, exit_error};
+use crate::cli_output::utils::{print_success, exit_error};
 use crate::config::Add;
 use crate::csv::{CsvLineReader, CsvLineWriter};
 

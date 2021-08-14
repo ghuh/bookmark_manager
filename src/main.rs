@@ -15,7 +15,7 @@ mod config;
 mod format_output;
 mod csv;
 mod commands;
-mod output_utils;
+mod cli_output;
 
 const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 
