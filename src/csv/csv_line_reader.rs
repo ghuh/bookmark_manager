@@ -60,7 +60,7 @@ fn parse_line(line: &str) -> Result<Line> {
 
 #[cfg(test)]
 mod tests {
-    use crate::csv::parse_line;
+    use crate::csv::csv_line_reader::parse_line;
 
     #[test]
     fn invalid_line() {

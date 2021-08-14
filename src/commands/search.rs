@@ -3,8 +3,8 @@ use regex::Regex;
 use ansi_term::Colour::{Blue};
 
 use crate::config::Search;
-use crate::csv::CsvLineReader;
 use crate::format_output::FormatOutput;
+use crate::csv::CsvLineReader;
 
 pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
