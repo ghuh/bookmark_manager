@@ -1,5 +1,5 @@
-pub mod csv_line_reader;
-pub mod csv_line_writer;
+mod csv_line_reader;
+mod csv_line_writer;
 
 use std::path::Path;
 use std::fs::File;
