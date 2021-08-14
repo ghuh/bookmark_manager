@@ -37,7 +37,7 @@ pub struct Add {
 
     /// Tags to group bookmarks
     #[clap(short, long = "tag")]
-    #[validate(custom = "validate_no_pipe_vec")]
+    #[validate(custom = "validate_tags")]
     pub tags: Vec<String>,
 
     // https://github.com/TeXitoi/structopt/blob/master/examples/negative_flag.rs
@@ -59,9 +59,18 @@ pub struct Search {
 #[derive(Debug, Clap)]
 pub struct Tags {}
 
-fn validate_no_pipe_vec(values: &Vec<String>) -> std::result::Result<(), ValidationError> {
+fn validate_tags(values: &Vec<String>) -> std::result::Result<(), ValidationError> {
     for val in values {
-        validate_no_pipe(val)?
+        validate_no_pipe(val)?;
+        validate_no_comma(val)?;
+    }
+
+    Ok(())
+}
+
+fn validate_no_comma(val: &str) -> std::result::Result<(), ValidationError> {
+    if val.contains(",") {
+        return Err(ValidationError::new("contains_comma"));
     }
 
     Ok(())
@@ -123,6 +132,18 @@ mod add_tests {
             url: String::from("https://wwww.google.com"),
             description: String::from("description"),
             tags: vec![String::from("t|ag")],
+            commit: true,
+        };
+
+        assert!(add_opts.validate().is_err());
+    }
+
+    #[test]
+    fn comma_in_tags() {
+        let add_opts = Add {
+            url: String::from("https://wwww.google.com"),
+            description: String::from("description"),
+            tags: vec![String::from("t,ag")],
             commit: true,
         };
 
