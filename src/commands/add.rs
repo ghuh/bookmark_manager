@@ -2,9 +2,8 @@ use anyhow::{Result, Context};
 use validator::Validate;
 use std::io::Write;
 use std::fs::OpenOptions;
-use ansi_term::Colour::{Green};
 
-use crate::output_utils::exit_error;
+use crate::output_utils::{print_success, exit_error};
 use crate::config::Add;
 use crate::csv::CsvLineReader;
 
@@ -26,7 +25,7 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     writeln!(f, "{}|{}|{}", add_opts.url, add_opts.description, add_opts.tags.join(",")).context("Could not add bookmark")?;
 
     // Success
-    println!("{}", Green.paint("Bookmark added"));
+    print_success("Bookmark added");
     Ok(())
 }
 
