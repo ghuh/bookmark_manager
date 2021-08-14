@@ -12,7 +12,6 @@ use crate::commands::search::search;
 use crate::commands::tags::tags;
 
 mod config;
-mod format_output;
 mod csv;
 mod commands;
 mod cli_output;

@@ -1,6 +1,6 @@
 use core::iter;
 
-pub struct FormatOutput {
+pub struct SearchResultOutput {
     url_max: usize,
     desc_max: usize,
     lines: Vec<Line>,
@@ -14,7 +14,7 @@ struct Line {
     tags: String,
 }
 
-impl FormatOutput {
+impl SearchResultOutput {
     pub fn new() -> Self {
         Self {
             url_max: 0,

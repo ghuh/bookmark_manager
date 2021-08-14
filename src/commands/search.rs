@@ -3,8 +3,8 @@ use regex::Regex;
 use ansi_term::Colour::{Blue};
 
 use crate::config::Search;
-use crate::format_output::FormatOutput;
 use crate::csv::CsvLineReader;
+use crate::cli_output::SearchResultOutput;
 
 pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
@@ -15,7 +15,7 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
         None => None
     };
 
-    let mut out = FormatOutput::new();
+    let mut out = SearchResultOutput::new();
 
     let reader = CsvLineReader::new(csv)?;
 
