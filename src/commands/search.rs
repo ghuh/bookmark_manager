@@ -285,6 +285,24 @@ mod tests {
         assert!(get_matched_parts(&m.description).is_empty());
     }
 
+    #[test]
+    fn multi_word_tag() {
+        let m = match_line(
+            &None,
+            &vec![String::from("Tag1 a doodle do")],
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: vec![String::from("Tag1 a Doodle Do"), String::from("Tag2"), String::from("Tag3")],
+            },
+        );
+
+        assert!(m.is_some());
+        let m = m.unwrap();
+        assert!(get_matched_parts(&m.url).is_empty());
+        assert!(get_matched_parts(&m.description).is_empty());
+    }
+
     fn single_matched_description(m: Option<MatchedBookmark>, expected_text: &str) {
         assert!(m.is_some());
         let matched_text = get_matched_parts(&m.unwrap().description);
