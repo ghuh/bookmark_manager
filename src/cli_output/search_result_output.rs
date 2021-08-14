@@ -1,17 +1,78 @@
 use core::iter;
+use ansi_term::Colour::{Blue};
+
+pub enum TextPart {
+    MatchedText(String),
+    Text(String),
+}
+
+impl TextPart {
+    /// The number of characters in this text part.
+    pub fn len(&self) -> usize {
+        let val = match self {
+            TextPart::MatchedText(val) => val,
+            TextPart::Text(val) => val,
+        };
+        val.chars().count()
+    }
+
+    /// The total number of characters in all the text parts in the vector.
+    pub fn vec_len(parts: &Vec<TextPart>) -> usize {
+        parts.iter().map(|part| part.len()).sum()
+    }
+
+    /// Highlighted the matched text
+    pub fn pretty_string(parts: &Vec<TextPart>) -> String {
+        let mut out = String::new();
+
+        for part in parts {
+            match part {
+                TextPart::MatchedText(val) => out.push_str(Blue.paint(val).to_string().as_str()),
+                TextPart::Text(val) => out.push_str(val.as_str()),
+            };
+        }
+
+        out
+    }
+}
+
+struct MatchedBookmark {
+    url: Vec<TextPart>,
+    description: Vec<TextPart>,
+    tags: Vec<String>,
+}
+
+impl MatchedBookmark {
+    /// Number of characters in URL (without formatting)
+    fn url_len(&self) -> usize {
+        TextPart::vec_len(&self.url)
+    }
+
+    /// Formatted URL for displaying on the terminal
+    fn url_pretty_string(&self) -> String {
+        TextPart::pretty_string(&self.url)
+    }
+
+    /// Number of characters in description (without formatting)
+    fn description_len(&self) -> usize {
+        TextPart::vec_len(&self.description)
+    }
+
+    /// Formatted description for displaying on the terminal
+    fn description_pretty_string(&self) -> String {
+        TextPart::pretty_string(&self.description)
+    }
+
+    /// Formatted tags for displaying on the terminal
+    fn tags_pretty_string(&self) -> String {
+        self.tags.join(" | ")
+    }
+}
 
 pub struct SearchResultOutput {
     url_max: usize,
     desc_max: usize,
-    lines: Vec<Line>,
-}
-
-struct Line {
-    url: String,
-    url_len: usize,
-    description: String,
-    desc_len: usize,
-    tags: String,
+    lines: Vec<MatchedBookmark>,
 }
 
 impl SearchResultOutput {
@@ -23,31 +84,42 @@ impl SearchResultOutput {
         }
     }
 
-    pub fn add_line(
+    pub fn add_tags_only_matched_bookmark(
         &mut self,
-        url: String,
-        url_len: usize,
-        description: String,
-        desc_len: usize,
-        tags: &Vec<String>,
+        url: &str,
+        description: &str,
+        tags: Vec<String>,
     ) {
+        self.add_matched_bookmark(
+            vec![TextPart::Text(String::from(url))],
+            vec![TextPart::Text(String::from(description))],
+            tags,
+        );
+    }
+
+    pub fn add_matched_bookmark(
+        &mut self,
+        url: Vec<TextPart>,
+        description: Vec<TextPart>,
+        tags: Vec<String>,
+    ) {
+        let matched_bookmark = MatchedBookmark {
+            url,
+            description,
+            tags,
+        };
+
+        let url_len = matched_bookmark.url_len();
         if url_len > self.url_max {
             self.url_max = url_len;
         }
 
+        let desc_len = matched_bookmark.description_len();
         if desc_len > self.desc_max {
             self.desc_max = desc_len;
         }
 
-        self.lines.push(
-            Line {
-                url,
-                url_len,
-                description,
-                desc_len,
-                tags: tags.join(" | "),
-            }
-        );
+        self.lines.push(matched_bookmark);
     }
 
     pub fn print(&self) {
@@ -55,11 +127,11 @@ impl SearchResultOutput {
             // Can't use println formatting width because gets messed up by colored lines
             println!(
                 "{}{} {}{} {}",
-                line.url,
-                generate_padding(line.url_len, self.url_max),
-                line.description,
-                generate_padding(line.desc_len, self.desc_max),
-                line.tags,
+                line.url_pretty_string(),
+                generate_padding(line.url_len(), self.url_max),
+                line.description_pretty_string(),
+                generate_padding(line.description_len(), self.desc_max),
+                line.tags_pretty_string(),
             );
         }
     }

@@ -1,10 +1,9 @@
 use anyhow::{ensure, Result, Context};
 use regex::Regex;
-use ansi_term::Colour::{Blue};
 
 use crate::config::Search;
 use crate::csv::CsvLineReader;
-use crate::cli_output::SearchResultOutput;
+use crate::cli_output::search_result_output::{TextPart, SearchResultOutput};
 
 pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
     // Make sure either REGEX or at least one tag
@@ -37,27 +36,23 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
 
         // If there are tags, they matched. Then, if there is a regex, it must match as well
         if let Some(regex) = &re {
-            let (url_is_match, url, url_length) = wrap_matches(regex, url);
-            let (desc_is_match, description, desc_length) = wrap_matches(regex, description);
+            let (url_is_match, url) = wrap_matches(regex, url);
+            let (desc_is_match, description) = wrap_matches(regex, description);
 
             if url_is_match || desc_is_match {
-                out.add_line(
+                out.add_matched_bookmark(
                     url,
-                    url_length,
                     description,
-                    desc_length,
-                    &tags,
+                    tags,
                 );
             }
         }
         // There is no regex, there are tags and they matched
         else {
-            out.add_line(
-                String::from(url),
-                url.chars().count(),
-                String::from(description),
-                description.chars().count(),
-                &tags,
+            out.add_tags_only_matched_bookmark(
+                url,
+                description,
+                tags,
             );
         }
     }
@@ -70,9 +65,9 @@ pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
 // https://stackoverflow.com/a/56923739
 /// Return if the regex was matched, the display string which will include any highlighting,
 /// and the number of characters in the original string.
-fn wrap_matches(re: &Regex, text: &str) -> (bool, String, usize) {
+fn wrap_matches(re: &Regex, text: &str) -> (bool, Vec<TextPart>) {
     let mut found: bool = false;
-    let mut out: String = String::new();
+    let mut parts: Vec<TextPart> = Vec::new();
 
     let mut last = 0;
     for mat in re.find_iter(text) {
@@ -83,12 +78,11 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, String, usize) {
 
         // Add everything up to the match
         if last != start {
-            out.push_str(&text[last..start]);
+            parts.push(TextPart::Text(String::from(&text[last..start])));
         }
 
         // Add the match
-        let colored_output = Blue.paint(&text[start..end]).to_string();
-        out.push_str(&colored_output);
+        parts.push(TextPart::MatchedText(String::from(&text[start..end])));
 
         last = end;
     }
@@ -96,8 +90,8 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, String, usize) {
     // Add any remaining text after last match
     // This will add the entire string if no matches found
     if last < text.len() {
-        out.push_str(&text[last..])
+        parts.push(TextPart::Text(String::from(&text[last..])));
     }
 
-    (found, out, text.chars().count())
+    (found, parts)
 }
