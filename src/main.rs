@@ -4,18 +4,17 @@
 
 use std::env;
 use std::path::Path;
-use std::fs::{File, OpenOptions};
+use std::fs::File;
 use std::io::Write;
 use clap::Clap;
-use validator::Validate;
 use anyhow::{ensure, Result, Context};
-use ansi_term::Colour::{Green, Blue};
+use ansi_term::Colour::{Blue};
 use regex::Regex;
 
-use config::{Command, Add, Search};
+use config::{Command, Search};
 use format_output::FormatOutput;
 use csv::CsvLineReader;
-use crate::output_utils::exit_error;
+use crate::commands::add::add;
 
 mod config;
 mod format_output;
@@ -52,41 +51,6 @@ fn create_csv(csv_path: &str) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn add(add_opts: &Add, csv: &String) -> Result<()> {
-    // Make sure Url is valid
-    add_opts.validate()?;
-
-    // Prevent duplicate bookmarks
-    if url_exists(add_opts.url.as_str(), csv)? {
-        exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
-    }
-
-    // Append bookmark to file
-    let mut f = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .open(&csv)
-        .unwrap();
-    writeln!(f, "{}|{}|{}", add_opts.url, add_opts.description, add_opts.tags.join(",")).context("Could not add bookmark")?;
-
-    // Success
-    println!("{}", Green.paint("Bookmark added"));
-    Ok(())
-}
-
-/// Check if URL already exists
-fn url_exists(url: &str, csv: &String) -> Result<bool> {
-    let reader = CsvLineReader::new(csv)?;
-
-    for line in reader {
-        if line?.url == url {
-            return Ok(true);
-        }
-    }
-
-    Ok(false)
 }
 
 fn search(search_opts: &Search, csv: &String) -> Result<()> {
