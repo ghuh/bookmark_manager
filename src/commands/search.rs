@@ -201,6 +201,72 @@ mod tests {
         single_matched_url(m, "goog");
     }
 
+    #[test]
+    fn tags_only() { // Multi word doesn't make sense for a URL
+        let m = match_line(
+            &None,
+            &vec![String::from("Tag1")],
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: vec![String::from("Tag1")],
+            },
+        );
+
+        assert!(m.is_some());
+        let m = m.unwrap();
+        assert!(get_matched_parts(&m.url).is_empty());
+        assert!(get_matched_parts(&m.description).is_empty());
+    }
+
+    #[test]
+    fn case_insensitive_tags() { // Multi word doesn't make sense for a URL
+        let m = match_line(
+            &None,
+            &vec![String::from("tag1")],
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: vec![String::from("Tag1")],
+            },
+        );
+
+        assert!(m.is_some());
+        let m = m.unwrap();
+        assert!(get_matched_parts(&m.url).is_empty());
+        assert!(get_matched_parts(&m.description).is_empty());
+    }
+
+    #[test]
+    fn tags_and_url_match() { // Multi word doesn't make sense for a URL
+        let m = match_line(
+            &regex_from_str("g..g"),
+            &vec![String::from("tag1")],
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: vec![String::from("Tag1")],
+            },
+        );
+
+        single_matched_url(m, "goog");
+    }
+
+    #[test]
+    fn url_match_tags_do_not() { // Multi word doesn't make sense for a URL
+        let m = match_line(
+            &regex_from_str("g..g"),
+            &vec![String::from("what")],
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: vec![String::from("Tag1")],
+            },
+        );
+
+        assert!(m.is_none());
+    }
+
     fn single_matched_description(m: Option<MatchedBookmark>, expected_text: &str) {
         assert!(m.is_some());
         let matched_text = get_matched_parts(&m.unwrap().description);
