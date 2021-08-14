@@ -76,11 +76,11 @@ bm help add
 bm s|search <REGEX>
 
 # Search with only regex, no tags
-# Note that single word seaches are case insensitive, but multi-word queries are not
+# The regex is case insensitive
 bm search "search engine"
 
 # Tags are like "and" queries
-# Tags are always case insensitive
+# Tags are case insensitive
 bm s google --tag Search
 
 # Search with only tags, no regex

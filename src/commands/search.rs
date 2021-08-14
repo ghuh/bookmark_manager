@@ -153,7 +153,7 @@ mod tests {
     #[test]
     fn case_insensitive_description() {
         let m = match_line(
-            &regex_from_str("Hi"),
+            &regex_from_str("hi"),
             &Vec::new(),
             Line {
                 url: String::from("https://google.com"),
@@ -163,6 +163,21 @@ mod tests {
         );
 
         single_matched_description(m, "Hi");
+    }
+
+    #[test]
+    fn multi_word_case_insensitive_description() {
+        let m = match_line(
+            &regex_from_str("hi There"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("Hi there"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_description(m, "Hi there");
     }
 
     #[test]
