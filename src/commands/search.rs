@@ -103,3 +103,102 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, Vec<TextPart>) {
 
     (found, parts)
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::commands::search::match_line;
+    use regex::Regex;
+    use crate::csv::Line;
+    use crate::cli_output::search_result_output::{TextPart, MatchedBookmark};
+
+    #[test]
+    fn no_match() {
+        let m = match_line(
+            &regex_from_str("what"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: Vec::new(),
+            },
+        );
+
+        assert!(m.is_none());
+    }
+
+    #[test]
+    fn single_word_match() {
+        let m = match_line(
+            &regex_from_str("Hi"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("Hi there"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_description(m, "Hi");
+    }
+
+    #[test]
+    fn regex_match() {
+        let m = match_line(
+            &regex_from_str("t.e"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("Hi there"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_description(m, "the");
+    }
+
+    #[test]
+    fn multi_word_match() {
+        let m = match_line(
+            &regex_from_str("more than"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: Vec::new(),
+            },
+        );
+
+        single_matched_description(m, "more than");
+    }
+
+    #[test]
+    fn url_match() {
+        let m = match_line(
+            &regex_from_str("google"),
+            &Vec::new(),
+            Line {
+                url: String::from("https://google.com"),
+                description: String::from("more than one"),
+                tags: Vec::new(),
+            },
+        );
+
+        assert!(m.is_some());
+    }
+
+    fn single_matched_description(m: Option<MatchedBookmark>, expected_text: &str) {
+        assert!(m.is_some());
+        let matched_text = m.unwrap().description.iter().filter_map(
+            |part| match part {
+                TextPart::MatchedText(v) => Some(TextPart::MatchedText(v.clone())),
+                _ => None,
+            }
+        ).collect::<Vec<TextPart>>();
+        assert_eq!(matched_text.len(), 1);
+        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+    }
+
+    fn regex_from_str(regex: &str) -> Option<Regex> {
+        Some(Regex::new(regex).unwrap())
+    }
+}

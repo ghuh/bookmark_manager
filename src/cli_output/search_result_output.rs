@@ -9,11 +9,15 @@ pub enum TextPart {
 impl TextPart {
     /// The number of characters in this text part.
     pub fn len(&self) -> usize {
-        let val = match self {
+        self.text().chars().count()
+    }
+
+    /// The raw text
+    pub fn text(&self) -> &String {
+        match self {
             TextPart::MatchedText(val) => val,
             TextPart::Text(val) => val,
-        };
-        val.chars().count()
+        }
     }
 
     /// The total number of characters in all the text parts in the vector.
@@ -37,9 +41,9 @@ impl TextPart {
 }
 
 pub struct MatchedBookmark {
-    url: Vec<TextPart>,
-    description: Vec<TextPart>,
-    tags: Vec<String>,
+    pub url: Vec<TextPart>,
+    pub description: Vec<TextPart>,
+    pub tags: Vec<String>,
 }
 
 impl MatchedBookmark {
