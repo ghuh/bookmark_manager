@@ -248,6 +248,18 @@ fn csv_not_in_git_root() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn csv_not_in_git_repo() -> Result<()> {
+    // Most of this code is from setup()
+    let dir = tempdir()?;
+    let csv_path = dir.path().join("tmp.csv");
+
+    // This will do its own assert
+    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
+
+    Ok(())
+}
+
 /// Setup the test environment with a temporary CSV file.
 /// To populate the CSV with contents, use "add" command.
 ///
