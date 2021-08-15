@@ -1,20 +1,34 @@
 use std::path::Path;
 use git2::{Repository, ObjectType, Commit, IndexAddOption};
 use anyhow::{Result, Context};
+use crate::cli_output::utils::print_warning;
 
 pub struct Git {
     repo: Repository,
 }
 
 impl Git {
-    pub fn new(csv: &str) -> Result<Self> {
-        // Get the directory the CSV is in
-        let dir = Path::new(csv).parent().expect("Could to get directory for CSV");
-        let repo = Repository::open(dir).context("Could not open git repo")?;
+    pub fn new(csv: &str) -> Option<Self> {
+        let mut dir = Path::new(csv);
 
-        Ok(Self {
-            repo,
-        })
+        // Traverse the directory tree looking for the git repo
+        let repo = loop {
+            match dir.parent() {
+                None => {
+                    print_warning("It appears the CSV file is not in a git repo. Use --no-commit to suppress this message");
+                    return None;
+                }
+                Some(new_dir) => {
+                    dir = new_dir;
+                    let repo_result = Repository::open(dir);
+                    if let Ok(repo) = repo_result {
+                        break repo;
+                    }
+                }
+            }
+        };
+
+        Some(Self { repo })
     }
 
     pub fn is_clean(&self) -> Result<bool> {

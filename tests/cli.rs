@@ -231,6 +231,23 @@ Search, search
     Ok(())
 }
 
+#[test]
+fn csv_not_in_git_root() -> Result<()> {
+    // Most of this code is from setup()
+    let dir = tempdir()?;
+    let sub_dir = dir.path().join("sub_dir");
+    std::fs::create_dir(&sub_dir)?;
+
+    let csv_path = sub_dir.join("tmp.csv");
+
+    init_repo_and_create_initial_commit(dir.path())?;
+
+    // This will do its own assert
+    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
+
+    Ok(())
+}
+
 /// Setup the test environment with a temporary CSV file.
 /// To populate the CSV with contents, use "add" command.
 ///

@@ -13,7 +13,7 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     // Open git repo unless user doesn't want to commit changes
     let git = match add_opts.commit {
         false => None,
-        true => Some(Git::new(csv.as_str())?),
+        true => Git::new(csv.as_str()),
     };
 
     // Make sure there aren't any uncommitted changes to the git repo before making any additional changes
