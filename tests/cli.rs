@@ -253,9 +253,26 @@ fn csv_not_in_git_repo() -> Result<()> {
     // Most of this code is from setup()
     let dir = tempdir()?;
     let csv_path = dir.path().join("tmp.csv");
+    let mut cmd = setup_cmd(&csv_path)?;
 
-    // This will do its own assert
-    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
+    cmd.arg("a").arg("https://google.com").arg("Google");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("It appears the CSV file is not in a git repo. Use --no-commit to suppress this message"));
+
+    Ok(())
+}
+
+#[test]
+fn fail_if_uncommitted_changes_in_git_rep() -> Result<()> {
+    let (csv_dir, _csv_path, mut cmd) = setup()?;
+
+    File::create(csv_dir.path().join("new_file"))?;
+
+    cmd.arg("a").arg("https://google.com").arg("Google");
+    cmd.assert()
+        .failure()
+        .stderr(predicate::str::contains("Git repo has uncommitted changes"));
 
     Ok(())
 }
