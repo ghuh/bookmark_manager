@@ -12,7 +12,7 @@ use anyhow::{Result, ensure};
 use tempfile::{tempdir, TempDir};
 use std::fs::File;
 use std::io::{BufReader, BufRead};
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use git2::{Repository};
 
 const HEADER_ROW: &str = "URL|DESCRIPTION|TAGS";
@@ -240,9 +240,7 @@ fn setup() -> Result<(TempDir, PathBuf, Command)> {
     let dir = tempdir()?;
     let csv_path = dir.path().join("tmp.csv");
 
-    // Init the git repo
-    let repo = Repository::init(&dir)?;
-    create_initial_commit(&repo)?;
+    init_repo_and_create_initial_commit(dir.path())?;
 
     let cmd = setup_cmd(&csv_path)?;
 
@@ -252,7 +250,9 @@ fn setup() -> Result<(TempDir, PathBuf, Command)> {
 // https://github.com/rust-lang/git2-rs/blob/master/examples/init.rs#L94
 /// Unlike regular "git init", this example shows how to create an initial empty
 /// commit in the repository. This is the helper function that does that.
-fn create_initial_commit(repo: &Repository) -> Result<(), git2::Error> {
+fn init_repo_and_create_initial_commit(git_repo_path: &Path) -> Result<(), git2::Error> {
+    let repo = Repository::init(&git_repo_path)?;
+
     // First use the config to initialize a commit signature for the user.
     let sig = repo.signature()?;
 
