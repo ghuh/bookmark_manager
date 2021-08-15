@@ -277,6 +277,21 @@ fn fail_if_uncommitted_changes_in_git_rep() -> Result<()> {
     Ok(())
 }
 
+#[test]
+fn no_commit() -> Result<()> {
+    let (csv_dir, _csv_path, mut cmd) = setup()?;
+
+    cmd.arg("a").arg("https://google.com").arg("Google").arg("--no-commit");
+    cmd.assert().success();
+
+    let repo = Repository::open(csv_dir.path())?;
+    let statuses = repo.statuses(None)?;
+    let is_dirty = statuses.iter().any(|e| e.status() != git2::Status::CURRENT);
+    assert!(is_dirty, "Working tree should be dirty");
+
+    Ok(())
+}
+
 /// Setup the test environment with a temporary CSV file.
 /// To populate the CSV with contents, use "add" command.
 ///
