@@ -3,15 +3,33 @@ use validator::Validate;
 
 use crate::cli_output::utils::{print_success, exit_error};
 use crate::config::Add;
-use crate::csv::{CsvLineReader, CsvLineWriter};
+use crate::csv::{CsvLineReader, CsvLineWriter, create_csv};
+use crate::git::Git;
 
 pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     // Make sure Url is valid
     add_opts.validate()?;
 
-    // Prevent duplicate bookmarks
-    if url_exists(add_opts.url.as_str(), csv)? {
-        exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
+    // Open git repo unless user doesn't want to commit changes
+    let git = match add_opts.commit {
+        false => None,
+        true => Some(Git::new(csv.as_str())?),
+    };
+
+    // Make sure there aren't any uncommitted changes to the git repo before making any additional changes
+    if let Some(git) = &git {
+        if !git.is_clean()? {
+            exit_error("Git repo has uncommitted changes");
+        }
+    }
+
+    let created = create_csv(csv)?;
+
+    // Prevent duplicate bookmarks (only on pre-existing files)
+    if !created {
+        if url_exists(add_opts.url.as_str(), csv)? {
+            exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
+        }
     }
 
     // Append bookmark to file
@@ -22,8 +40,18 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
         &add_opts.tags,
     )?;
 
+    if let Some(git) = &git {
+        git.add_and_commit_bookmark(
+            add_opts.url.as_str(),
+            add_opts.description.as_str(),
+        )?;
+    }
+
     // Success
-    print_success("Bookmark added");
+    match &git {
+        Some(_) => print_success("Bookmark added and committed to git"),
+        None => print_success("Bookmark added"),
+    }
     Ok(())
 }
 

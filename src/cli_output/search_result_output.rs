@@ -152,7 +152,12 @@ fn generate_padding(current_len: usize, pad_to: usize) -> String {
     iter::repeat(' ').take(pad_to - current_len).collect()
 }
 
-#[test]
-fn test_generate_padding() {
-    assert_eq!(generate_padding(7, 10), "   ");
+#[cfg(test)]
+mod tests {
+    use crate::cli_output::search_result_output::generate_padding;
+
+    #[test]
+    fn test_generate_padding() {
+        assert_eq!(generate_padding(7, 10), "   ");
+    }
 }

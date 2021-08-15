@@ -13,6 +13,7 @@ use tempfile::{tempdir, TempDir};
 use std::fs::File;
 use std::io::{BufReader, BufRead};
 use std::path::PathBuf;
+use git2::{Repository};
 
 const HEADER_ROW: &str = "URL|DESCRIPTION|TAGS";
 
@@ -239,9 +240,43 @@ fn setup() -> Result<(TempDir, PathBuf, Command)> {
     let dir = tempdir()?;
     let csv_path = dir.path().join("tmp.csv");
 
+    // Init the git repo
+    let repo = Repository::init(&dir)?;
+    create_initial_commit(&repo)?;
+
     let cmd = setup_cmd(&csv_path)?;
 
     Ok((dir, csv_path, cmd))
+}
+
+// https://github.com/rust-lang/git2-rs/blob/master/examples/init.rs#L94
+/// Unlike regular "git init", this example shows how to create an initial empty
+/// commit in the repository. This is the helper function that does that.
+fn create_initial_commit(repo: &Repository) -> Result<(), git2::Error> {
+    // First use the config to initialize a commit signature for the user.
+    let sig = repo.signature()?;
+
+    // Now let's create an empty tree for this commit
+    let tree_id = {
+        let mut index = repo.index()?;
+
+        // Outside of this example, you could call index.add_path()
+        // here to put actual files into the index. For our purposes, we'll
+        // leave it empty for now.
+
+        index.write_tree()?
+    };
+
+    let tree = repo.find_tree(tree_id)?;
+
+    // Ready to create the initial commit.
+    //
+    // Normally creating a commit would involve looking up the current HEAD
+    // commit and making that be the parent of the initial commit, but here this
+    // is the first commit so there will be no parent.
+    repo.commit(Some("HEAD"), &sig, &sig, "Initial commit", &tree, &[])?;
+
+    Ok(())
 }
 
 fn setup_cmd(csv_path: &PathBuf) -> Result<Command> {
@@ -284,5 +319,14 @@ fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<
     ensure!(num_matches == &expected_num_matches,
         "Unexpected number of matches [{}]: {}", num_matches, stdout);
 
+    Ok(())
+}
+
+/// Handy utility method for printing out the current git status
+#[allow(dead_code)]
+fn debug_git_status(csv_path: &PathBuf) -> Result<()> {
+    let git_output = Command::new("/usr/local/bin//git").arg("status").current_dir(csv_path.as_path().parent().unwrap()).output()?;
+    let git_stdout = std::str::from_utf8(&*git_output.stdout).unwrap();
+    println!("GIT STATUS =\n{}", git_stdout);
     Ok(())
 }
