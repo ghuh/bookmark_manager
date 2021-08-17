@@ -28,7 +28,7 @@ Requires [installing Rust](https://www.rust-lang.org/tools/install).
 
 ```bash
 # Installs to ~/.cargo/bin which should be in your path if you installed Rust according to the standard instructions.
-cargo install --features=fail-on-warnings --path .
+cargo install --path .
 ```
 
 ## Usage
