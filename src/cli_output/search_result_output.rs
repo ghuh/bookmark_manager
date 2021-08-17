@@ -1,4 +1,3 @@
-use core::iter;
 use ansi_term::Colour::{Blue};
 
 pub enum TextPart {
@@ -21,12 +20,12 @@ impl TextPart {
     }
 
     /// The total number of characters in all the text parts in the vector.
-    pub fn vec_len(parts: &Vec<TextPart>) -> usize {
+    pub fn vec_len(parts: &[TextPart]) -> usize {
         parts.iter().map(|part| part.len()).sum()
     }
 
     /// Highlighted the matched text
-    pub fn pretty_string(parts: &Vec<TextPart>) -> String {
+    pub fn pretty_string(parts: &[TextPart]) -> String {
         let mut out = String::new();
 
         for part in parts {
@@ -65,7 +64,7 @@ impl MatchedBookmark {
         mut tags: Vec<String>,
     ) -> Self {
         // Sort tags case insensitively for output, but display in their original case
-        tags.sort_by(|a, b| a.to_lowercase().cmp(&b.to_lowercase()));
+        tags.sort_by_key(|a| a.to_lowercase());
 
         Self {
             url,
@@ -149,7 +148,7 @@ impl SearchResultOutput {
 
 // Inspiration: https://docs.rs/crate/tabwriter/1.2.1/source/src/lib.rs
 fn generate_padding(current_len: usize, pad_to: usize) -> String {
-    iter::repeat(' ').take(pad_to - current_len).collect()
+    " ".repeat(pad_to - current_len)
 }
 
 #[cfg(test)]

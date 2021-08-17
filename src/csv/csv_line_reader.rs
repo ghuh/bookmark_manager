@@ -12,7 +12,7 @@ impl CsvLineReader {
     pub fn new(csv: &str) -> Result<Self> {
         let file = File::open(csv).context("Could not open CSV file")?;
         let reader = BufReader::new(file);
-        let mut iter = reader.lines().into_iter();
+        let mut iter = reader.lines();
 
         // Skip headers (i.e. first line)
         iter.next();
@@ -44,12 +44,12 @@ impl Iterator for CsvLineReader {
 }
 
 fn parse_line(line: &str) -> Result<Line> {
-    let line_parts = line.split("|").collect::<Vec<&str>>();
+    let line_parts = line.split('|').collect::<Vec<&str>>();
     ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
 
     let url = String::from(line_parts[0]);
     let description = String::from(line_parts[1]);
-    let tags = line_parts[2].split(",").map(|tag| String::from(tag)).collect::<Vec<String>>();
+    let tags = line_parts[2].split(',').map(String::from).collect::<Vec<String>>();
 
     Ok(Line { url, description, tags })
 }

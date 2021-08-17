@@ -27,10 +27,8 @@ fn main() -> Result<()> {
         .expect(&*format!("Environmental variable {} must be set", ENV_CSV));
 
     // The add command will create the CSV, the others will fail if it does not exit
-    if let Command::Add(_) = opt.cmd {} else {
-        if !csv::csv_exists(csv.as_str()) {
-            exit_error("The CSV file doesn't exist.  It will be created the first time you run 'add'.");
-        }
+    if let Command::Add(_) = opt.cmd {} else if !csv::csv_exists(csv.as_str()) {
+        exit_error("The CSV file doesn't exist.  It will be created the first time you run 'add'.");
     }
 
     match opt.cmd {

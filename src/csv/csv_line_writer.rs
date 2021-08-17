@@ -19,7 +19,7 @@ impl CsvLineWriter {
         })
     }
 
-    pub fn write_line(&mut self, url: &str, description: &str, tags: &Vec<String>) -> Result<()> {
+    pub fn write_line(&mut self, url: &str, description: &str, tags: &[String]) -> Result<()> {
         writeln!(self.file, "{}|{}|{}", url, description, tags.join(","))
             .context("Could not add bookmark")?;
         Ok(())

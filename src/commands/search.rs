@@ -6,7 +6,7 @@ use crate::csv::{Line, CsvLineReader};
 use crate::cli_output::search_result_output::{TextPart, SearchResultOutput, MatchedBookmark};
 use std::collections::HashMap;
 
-pub fn search(search_opts: &Search, csv: &String) -> Result<()> {
+pub fn search(search_opts: &Search, csv: &str) -> Result<()> {
     // Make sure either REGEX or at least one tag
     ensure!(search_opts.regex.is_some() || !search_opts.tags.is_empty(), "Either a REGEX or a tag is required");
 
@@ -40,7 +40,7 @@ fn build_regex(regex: &str) -> Result<Regex> {
     Ok(re)
 }
 
-fn match_line(re: &Option<Regex>, search_tags: &Vec<String>, line: Line) -> Option<MatchedBookmark> {
+fn match_line(re: &Option<Regex>, search_tags: &[String], line: Line) -> Option<MatchedBookmark> {
     let url = line.url.as_str();
     let description = line.description.as_str();
 

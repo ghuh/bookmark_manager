@@ -10,7 +10,7 @@ pub use csv_line_reader::CsvLineReader;
 pub use csv_line_writer::CsvLineWriter;
 use crate::cli_output::utils::print_success;
 
-const ORDERED_HEADERS: [&'static str; 3] = ["URL", "DESCRIPTION", "TAGS"];
+const ORDERED_HEADERS: [&str; 3] = ["URL", "DESCRIPTION", "TAGS"];
 
 pub struct Line {
     pub url: String,

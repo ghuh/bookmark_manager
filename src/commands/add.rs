@@ -6,14 +6,14 @@ use crate::config::Add;
 use crate::csv::{CsvLineReader, CsvLineWriter, create_csv};
 use crate::git::Git;
 
-pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
+pub fn add(add_opts: &Add, csv: &str) -> Result<()> {
     // Make sure Url is valid
     add_opts.validate()?;
 
     // Open git repo unless user doesn't want to commit changes
     let git = match add_opts.commit {
         false => None,
-        true => Git::new(csv.as_str()),
+        true => Git::new(csv),
     };
 
     // Make sure there aren't any uncommitted changes to the git repo before making any additional changes
@@ -26,14 +26,12 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
     let created = create_csv(csv)?;
 
     // Prevent duplicate bookmarks (only on pre-existing files)
-    if !created {
-        if url_exists(add_opts.url.as_str(), csv)? {
-            exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
-        }
+    if !created && url_exists(add_opts.url.as_str(), csv)? {
+        exit_error(format!("{} has already been bookmarked", add_opts.url).as_str());
     }
 
     // Append bookmark to file
-    let mut writer = CsvLineWriter::new(csv.as_str())?;
+    let mut writer = CsvLineWriter::new(csv)?;
     writer.write_line(
         add_opts.url.as_str(),
         add_opts.description.as_str(),
@@ -56,7 +54,7 @@ pub fn add(add_opts: &Add, csv: &String) -> Result<()> {
 }
 
 /// Check if URL already exists
-fn url_exists(url: &str, csv: &String) -> Result<bool> {
+fn url_exists(url: &str, csv: &str) -> Result<bool> {
     let reader = CsvLineReader::new(csv)?;
 
     for line in reader {

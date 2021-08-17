@@ -59,7 +59,7 @@ pub struct Search {
 #[derive(Debug, Clap)]
 pub struct Tags {}
 
-fn validate_tags(values: &Vec<String>) -> std::result::Result<(), ValidationError> {
+fn validate_tags(values: &[String]) -> std::result::Result<(), ValidationError> {
     for val in values {
         validate_no_pipe(val)?;
         validate_no_comma(val)?;
@@ -69,7 +69,7 @@ fn validate_tags(values: &Vec<String>) -> std::result::Result<(), ValidationErro
 }
 
 fn validate_no_comma(val: &str) -> std::result::Result<(), ValidationError> {
-    if val.contains(",") {
+    if val.contains(',') {
         return Err(ValidationError::new("contains_comma"));
     }
 
@@ -77,7 +77,7 @@ fn validate_no_comma(val: &str) -> std::result::Result<(), ValidationError> {
 }
 
 fn validate_no_pipe(val: &str) -> std::result::Result<(), ValidationError> {
-    if val.contains("|") {
+    if val.contains('|') {
         return Err(ValidationError::new("contains_pipe"));
     }
 
