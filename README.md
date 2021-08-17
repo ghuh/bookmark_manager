@@ -128,8 +128,9 @@ Requires [installing Rust](https://www.rust-lang.org/tools/install).
 ### Test
 
 ```bash
+cargo clippy -- -D warnings
 # Runs unit and integration tests
-cargo test --features=fail-on-warnings
+cargo test
 ```
 
 ### Build
@@ -144,10 +145,12 @@ cargo build
 
 ```bash
 # To keep a clean build, fail on any compiler warnings, not just errors
-cargo build --release --features=fail-on-warnings
+cargo clippy -- -D warnings
+cargo test
+cargo build --release
 ```
 
-### Run
+### Run from source
 
 ```bash
 cargo run -- add https://www.google.com "Google search engine" -t Search
