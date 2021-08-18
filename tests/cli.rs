@@ -391,3 +391,11 @@ fn debug_git_status(csv_path: &Path) -> Result<()> {
     println!("GIT STATUS =\n{}", git_stdout);
     Ok(())
 }
+
+/// Handy utility method for printing out the current git status
+#[allow(dead_code)]
+fn debug_csv_file(csv_path: &Path) -> Result<()> {
+    let contents = std::fs::read_to_string(csv_path)?;
+    println!("CSV FILE CONTENTS =\n{}", contents);
+    Ok(())
+}
