@@ -146,10 +146,13 @@ cargo build
 
 #### Release Build
 
+All these steps need to pass otherwise the [CI build](.github/workflows/ci.yaml) will fail.
+
 ```bash
 # To keep a clean build, fail on any compiler warnings, not just errors
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test
+cargo fmt
 cargo build --release
 ```
 
