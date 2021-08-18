@@ -1,4 +1,4 @@
-![CI Status](https://github.com/ghuh/bookmark_manager/actions/workflows/ci/badge.svg?event=push&branch=master)
+![CI Status](https://github.com/ghuh/bookmark_manager/actions/workflows/ci.yaml/badge.svg?event=push&branch=master)
 
 # Bookmark Manager
 
