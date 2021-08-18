@@ -244,7 +244,7 @@ mod tests {
     fn tags_only() {
         let m = match_line(
             &None,
-            &vec![String::from("Tag1")],
+            &[String::from("Tag1")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -262,7 +262,7 @@ mod tests {
     fn case_insensitive_tags() {
         let m = match_line(
             &None,
-            &vec![String::from("tag1")],
+            &[String::from("tag1")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -280,7 +280,7 @@ mod tests {
     fn tags_and_url_match() {
         let m = match_line(
             &regex_from_str("g..g"),
-            &vec![String::from("tag1")],
+            &[String::from("tag1")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -295,7 +295,7 @@ mod tests {
     fn url_match_tags_do_not() {
         let m = match_line(
             &regex_from_str("g..g"),
-            &vec![String::from("what")],
+            &[String::from("what")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -310,7 +310,7 @@ mod tests {
     fn multiple_tags() {
         let m = match_line(
             &None,
-            &vec![String::from("Tag1"), String::from("Tag2")],
+            &[String::from("Tag1"), String::from("Tag2")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -328,7 +328,7 @@ mod tests {
     fn multi_word_tag() {
         let m = match_line(
             &None,
-            &vec![String::from("Tag1 a doodle do")],
+            &[String::from("Tag1 a doodle do")],
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
@@ -356,7 +356,7 @@ mod tests {
         assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
     }
 
-    fn get_matched_parts(parts: &Vec<TextPart>) -> Vec<TextPart> {
+    fn get_matched_parts(parts: &[TextPart]) -> Vec<TextPart> {
         parts.iter().filter_map(
             |part| match part {
                 TextPart::MatchedText(v) => Some(TextPart::MatchedText(v.clone())),

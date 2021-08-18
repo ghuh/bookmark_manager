@@ -340,7 +340,7 @@ fn init_repo_and_create_initial_commit(git_repo_path: &Path) -> Result<(), git2:
     Ok(())
 }
 
-fn setup_cmd(csv_path: &PathBuf) -> Result<Command> {
+fn setup_cmd(csv_path: &Path) -> Result<Command> {
     let mut cmd = Command::cargo_bin("bm")?;
 
     cmd.env("BOOKMARK_MANAGER_CSV", csv_path.to_str().unwrap());
@@ -350,7 +350,7 @@ fn setup_cmd(csv_path: &PathBuf) -> Result<Command> {
 
 /// Use the program to add a bookmark.
 /// This is useful for setting up for a search test.
-fn setup_add(csv_path: &PathBuf, url: &str, description: &str, tags: Option<Vec<&str>>) -> Result<()> {
+fn setup_add(csv_path: &Path, url: &str, description: &str, tags: Option<Vec<&str>>) -> Result<()> {
     let mut cmd = setup_cmd(csv_path)?;
 
     cmd.arg("add")
@@ -385,8 +385,8 @@ fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<
 
 /// Handy utility method for printing out the current git status
 #[allow(dead_code)]
-fn debug_git_status(csv_path: &PathBuf) -> Result<()> {
-    let git_output = Command::new("/usr/local/bin//git").arg("status").current_dir(csv_path.as_path().parent().unwrap()).output()?;
+fn debug_git_status(csv_path: &Path) -> Result<()> {
+    let git_output = Command::new("/usr/local/bin//git").arg("status").current_dir(csv_path.parent().unwrap()).output()?;
     let git_stdout = std::str::from_utf8(&*git_output.stdout).unwrap();
     println!("GIT STATUS =\n{}", git_stdout);
     Ok(())

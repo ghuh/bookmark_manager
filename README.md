@@ -130,7 +130,8 @@ Requires [installing Rust](https://www.rust-lang.org/tools/install).
 ### Test
 
 ```bash
-cargo clippy -- -D warnings
+# Lint
+cargo clippy --all-targets --all-features -- -D warnings
 # Runs unit and integration tests
 cargo test
 ```
@@ -147,7 +148,7 @@ cargo build
 
 ```bash
 # To keep a clean build, fail on any compiler warnings, not just errors
-cargo clippy -- -D warnings
+cargo clippy --all-targets --all-features -- -D warnings
 cargo test
 cargo build --release
 ```
