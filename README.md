@@ -1,3 +1,5 @@
+![CI Status](https://github.com/ghuh/bookmark_manager/actions/workflows/ci/badge.svg?event=push&branch=master)
+
 # Bookmark Manager
 
 or `bm` for short because who doesn't like a good bm...
