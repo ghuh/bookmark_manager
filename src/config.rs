@@ -36,7 +36,7 @@ pub struct Add {
     pub description: String,
 
     /// Tags to group bookmarks
-    #[clap(short, long = "tag")]
+    #[clap(short, long = "tag", multiple_occurrences(true))]
     #[validate(custom = "validate_tags")]
     pub tags: Vec<String>,
 
@@ -52,7 +52,7 @@ pub struct Search {
     pub regex: Option<String>,
 
     /// Only apply REGEX to bookmarks with the given tags (can be none)
-    #[clap(short, long = "tag")]
+    #[clap(short, long = "tag", multiple_occurrences(true))]
     pub tags: Vec<String>,
 }
 
