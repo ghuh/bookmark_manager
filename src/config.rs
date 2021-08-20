@@ -35,6 +35,8 @@ pub struct Add {
     #[validate(custom = "validate_no_pipe")]
     pub description: String,
 
+    // https://github.com/clap-rs/clap/blob/3f94d17c71d8dea26133dbe107289c7f0c187499/clap_derive/tests/custom-string-parsers.rs#L29
+    // https://docs.rs/clap/3.0.0-beta.4/clap/struct.Arg.html#method.multiple_occurrences
     /// Tags to group bookmarks
     #[clap(short, long = "tag", multiple_occurrences(true))]
     #[validate(custom = "validate_tags")]
@@ -51,6 +53,8 @@ pub struct Search {
     /// Perl style REGEX to run against bookmark URL and description.  Omit to do tags only search.
     pub regex: Option<String>,
 
+    // https://github.com/clap-rs/clap/blob/3f94d17c71d8dea26133dbe107289c7f0c187499/clap_derive/tests/custom-string-parsers.rs#L29
+    // https://docs.rs/clap/3.0.0-beta.4/clap/struct.Arg.html#method.multiple_occurrences
     /// Only apply REGEX to bookmarks with the given tags (can be none)
     #[clap(short, long = "tag", multiple_occurrences(true))]
     pub tags: Vec<String>,
