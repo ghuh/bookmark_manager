@@ -1,6 +1,6 @@
-use anyhow::{Result, Context, ensure};
+use anyhow::{ensure, Context, Result};
 use std::fs::File;
-use std::io::{BufReader, BufRead, Lines};
+use std::io::{BufRead, BufReader, Lines};
 
 use super::Line;
 
@@ -17,9 +17,7 @@ impl CsvLineReader {
         // Skip headers (i.e. first line)
         iter.next();
 
-        Ok(Self {
-            lines: iter,
-        })
+        Ok(Self { lines: iter })
     }
 }
 
@@ -45,13 +43,23 @@ impl Iterator for CsvLineReader {
 
 fn parse_line(line: &str) -> Result<Line> {
     let line_parts = line.split('|').collect::<Vec<&str>>();
-    ensure!(line_parts.len() == 3, format!("CSV line has more than 3 columns: {}", line));
+    ensure!(
+        line_parts.len() == 3,
+        format!("CSV line has more than 3 columns: {}", line)
+    );
 
     let url = String::from(line_parts[0]);
     let description = String::from(line_parts[1]);
-    let tags = line_parts[2].split(',').map(String::from).collect::<Vec<String>>();
+    let tags = line_parts[2]
+        .split(',')
+        .map(String::from)
+        .collect::<Vec<String>>();
 
-    Ok(Line { url, description, tags })
+    Ok(Line {
+        url,
+        description,
+        tags,
+    })
 }
 
 #[cfg(test)]

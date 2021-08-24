@@ -1,4 +1,4 @@
-use ansi_term::Colour::{Blue};
+use ansi_term::Colour::Blue;
 
 pub enum TextPart {
     MatchedText(String),
@@ -46,11 +46,7 @@ pub struct MatchedBookmark {
 }
 
 impl MatchedBookmark {
-    pub fn new_tags_only(
-        url: &str,
-        description: &str,
-        tags: Vec<String>,
-    ) -> Self {
+    pub fn new_tags_only(url: &str, description: &str, tags: Vec<String>) -> Self {
         MatchedBookmark::new(
             vec![TextPart::Text(String::from(url))],
             vec![TextPart::Text(String::from(description))],
@@ -58,11 +54,7 @@ impl MatchedBookmark {
         )
     }
 
-    pub fn new(
-        url: Vec<TextPart>,
-        description: Vec<TextPart>,
-        mut tags: Vec<String>,
-    ) -> Self {
+    pub fn new(url: Vec<TextPart>, description: Vec<TextPart>, mut tags: Vec<String>) -> Self {
         // Sort tags case insensitively for output, but display in their original case
         tags.sort_by_key(|a| a.to_lowercase());
 
@@ -114,10 +106,7 @@ impl SearchResultOutput {
         }
     }
 
-    pub fn add_matched_bookmark(
-        &mut self,
-        matched_bookmark: MatchedBookmark,
-    ) {
+    pub fn add_matched_bookmark(&mut self, matched_bookmark: MatchedBookmark) {
         let url_len = matched_bookmark.url_len();
         if url_len > self.url_max {
             self.url_max = url_len;

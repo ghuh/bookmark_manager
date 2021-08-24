@@ -1,19 +1,22 @@
-use anyhow::{ensure, Result, Context};
+use anyhow::{ensure, Context, Result};
 use regex::{Regex, RegexBuilder};
 
+use crate::cli_output::search_result_output::{MatchedBookmark, SearchResultOutput, TextPart};
 use crate::config::Search;
-use crate::csv::{Line, CsvLineReader};
-use crate::cli_output::search_result_output::{TextPart, SearchResultOutput, MatchedBookmark};
+use crate::csv::{CsvLineReader, Line};
 use std::collections::HashMap;
 
 pub fn search(search_opts: &Search, csv: &str) -> Result<()> {
     // Make sure either REGEX or at least one tag
-    ensure!(search_opts.regex.is_some() || !search_opts.tags.is_empty(), "Either a REGEX or a tag is required");
+    ensure!(
+        search_opts.regex.is_some() || !search_opts.tags.is_empty(),
+        "Either a REGEX or a tag is required"
+    );
 
     // Only compile the regex once
     let re = match &search_opts.regex {
         Some(regex) => Some(build_regex(regex.as_str())?),
-        None => None
+        None => None,
     };
 
     let mut out = SearchResultOutput::new();
@@ -44,11 +47,18 @@ fn match_line(re: &Option<Regex>, search_tags: &[String], line: Line) -> Option<
     let url = line.url.as_str();
     let description = line.description.as_str();
 
-    let tag_lookup = line.tags.iter().map(|tag| (tag.to_lowercase(), 1)).collect::<HashMap<String, _>>();
+    let tag_lookup = line
+        .tags
+        .iter()
+        .map(|tag| (tag.to_lowercase(), 1))
+        .collect::<HashMap<String, _>>();
 
     // Make sure the line has all tags
     // https://stackoverflow.com/a/64227550
-    if !search_tags.iter().all(|tag| tag_lookup.contains_key(&tag.to_lowercase())) {
+    if !search_tags
+        .iter()
+        .all(|tag| tag_lookup.contains_key(&tag.to_lowercase()))
+    {
         return None;
     }
 
@@ -58,22 +68,12 @@ fn match_line(re: &Option<Regex>, search_tags: &[String], line: Line) -> Option<
         let (desc_is_match, description) = wrap_matches(regex, description);
 
         if url_is_match || desc_is_match {
-            return Some(MatchedBookmark::new(
-                url,
-                description,
-                line.tags,
-            ));
+            return Some(MatchedBookmark::new(url, description, line.tags));
         }
     }
     // There is no regex, there are tags and they matched
     else {
-        return Some(
-            MatchedBookmark::new_tags_only(
-                url,
-                description,
-                line.tags,
-            )
-        );
+        return Some(MatchedBookmark::new_tags_only(url, description, line.tags));
     }
 
     None
@@ -115,10 +115,10 @@ fn wrap_matches(re: &Regex, text: &str) -> (bool, Vec<TextPart>) {
 
 #[cfg(test)]
 mod tests {
-    use crate::commands::search::{match_line, build_regex};
-    use regex::Regex;
+    use crate::cli_output::search_result_output::{MatchedBookmark, TextPart};
+    use crate::commands::search::{build_regex, match_line};
     use crate::csv::Line;
-    use crate::cli_output::search_result_output::{TextPart, MatchedBookmark};
+    use regex::Regex;
 
     #[test]
     fn no_match() {
@@ -211,7 +211,8 @@ mod tests {
     }
 
     #[test]
-    fn single_word_url() { // Multi word doesn't make sense for a URL
+    fn single_word_url() {
+        // Multi word doesn't make sense for a URL
         let m = match_line(
             &regex_from_str("google"),
             &Vec::new(),
@@ -314,7 +315,11 @@ mod tests {
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
-                tags: vec![String::from("Tag1"), String::from("Tag2"), String::from("Tag3")],
+                tags: vec![
+                    String::from("Tag1"),
+                    String::from("Tag2"),
+                    String::from("Tag3"),
+                ],
             },
         );
 
@@ -332,7 +337,11 @@ mod tests {
             Line {
                 url: String::from("https://google.com"),
                 description: String::from("more than one"),
-                tags: vec![String::from("Tag1 a Doodle Do"), String::from("Tag2"), String::from("Tag3")],
+                tags: vec![
+                    String::from("Tag1 a Doodle Do"),
+                    String::from("Tag2"),
+                    String::from("Tag3"),
+                ],
             },
         );
 
@@ -357,12 +366,13 @@ mod tests {
     }
 
     fn get_matched_parts(parts: &[TextPart]) -> Vec<TextPart> {
-        parts.iter().filter_map(
-            |part| match part {
+        parts
+            .iter()
+            .filter_map(|part| match part {
                 TextPart::MatchedText(v) => Some(TextPart::MatchedText(v.clone())),
                 _ => None,
-            }
-        ).collect::<Vec<TextPart>>()
+            })
+            .collect::<Vec<TextPart>>()
     }
 
     fn regex_from_str(regex: &str) -> Option<Regex> {

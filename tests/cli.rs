@@ -8,12 +8,12 @@ use predicates::prelude::*;
 // Used for writing assertions
 use std::process::Command;
 // Run programs
-use anyhow::{Result, ensure};
-use tempfile::{tempdir, TempDir};
+use anyhow::{ensure, Result};
+use git2::Repository;
 use std::fs::File;
-use std::io::{BufReader, BufRead};
-use std::path::{PathBuf, Path};
-use git2::{Repository};
+use std::io::{BufRead, BufReader};
+use std::path::{Path, PathBuf};
+use tempfile::{tempdir, TempDir};
 
 const HEADER_ROW: &str = "URL|DESCRIPTION|TAGS";
 
@@ -42,7 +42,10 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
     buffer.read_line(&mut first_line)?;
 
     // Need to trim to remove new line at the end
-    ensure!(first_line.trim() == HEADER_ROW, "Program didn't create header");
+    ensure!(
+        first_line.trim() == HEADER_ROW,
+        "Program didn't create header"
+    );
 
     Ok(())
 }
@@ -51,7 +54,12 @@ fn create_csv_with_headers_if_not_exist() -> Result<()> {
 fn no_duplicate_urls() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
     cmd.arg("a").arg("https://google.com").arg("Google");
     cmd.assert()
         .failure()
@@ -75,7 +83,12 @@ fn ignore_first_line() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
 
     cmd.arg("search").arg("URL");
 
@@ -89,7 +102,12 @@ fn sort_tags() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Tags are out of order
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", Some(vec!["c", "B", "a"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        Some(vec!["c", "B", "a"]),
+    )?;
 
     cmd.arg("search").arg("google");
 
@@ -106,9 +124,24 @@ fn single_word_match() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search", "Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo Engine",
+        Some(vec!["Yahoo", "Search"]),
+    )?;
 
     // Case insensitive search
     cmd.arg("search").arg("google");
@@ -123,9 +156,24 @@ fn regex_match() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search", "Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo Engine",
+        Some(vec!["Yahoo", "Search"]),
+    )?;
 
     // Note that is should only match URL and description, not tags
     cmd.arg("search").arg("S.arch");
@@ -140,9 +188,24 @@ fn search_alias_s() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search", "Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo Engine",
+        Some(vec!["Yahoo", "Search"]),
+    )?;
 
     // Note that is should only match URL and description, not tags
     cmd.arg("s").arg("Engine");
@@ -157,9 +220,24 @@ fn multi_word_match() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search", "Engine"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search", "Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo Engine",
+        Some(vec!["Yahoo", "Search"]),
+    )?;
 
     // Case insensitive search that only matches the two words together
     cmd.arg("search").arg("Search Engine");
@@ -175,10 +253,30 @@ fn tags_only_query() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google Search Engine", None)?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search Engine"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo Engine", Some(vec!["Yahoo", "Search"]))?;
-    setup_add(&csv_path, "https://duckduckgo.com/", "Privacy search Engine", Some(vec!["Search Engine"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google Search Engine",
+        None,
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo Engine",
+        Some(vec!["Yahoo", "Search"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://duckduckgo.com/",
+        "Privacy search Engine",
+        Some(vec!["Search Engine"]),
+    )?;
 
     // Case insensitive search that only matches the two words together
     cmd.arg("search").arg("--tag").arg("Search Engine");
@@ -194,15 +292,38 @@ fn multi_tag_query() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["Search"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo match me Engine", Some(vec!["Search", "Engine"]))?;
-    setup_add(&csv_path, "https://duckduckgo.com/", "Privacy match me search Engine", Some(vec!["Search", "Engine"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google match me Search Engine",
+        Some(vec!["Search"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["Search"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo match me Engine",
+        Some(vec!["Search", "Engine"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://duckduckgo.com/",
+        "Privacy match me search Engine",
+        Some(vec!["Search", "Engine"]),
+    )?;
 
     // Case insensitive search that only matches the two words together
-    cmd.arg("search").arg("match me")
-        .arg("--tag").arg("Search")
-        .arg("-t").arg("engine");
+    cmd.arg("search")
+        .arg("match me")
+        .arg("--tag")
+        .arg("Search")
+        .arg("-t")
+        .arg("engine");
 
     test_count_matches(&mut cmd, 2)?;
 
@@ -214,19 +335,40 @@ fn list_tags() -> Result<()> {
     let (_csv_dir, csv_path, mut cmd) = setup()?;
 
     // Create the file, header, and a line to search
-    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
-    setup_add(&csv_path, "https://bing.com", "MS Search", Some(vec!["search", "a"]))?;
-    setup_add(&csv_path, "https://yahoo.com", "Yahoo match me Engine", Some(vec!["Search", "B"]))?;
-    setup_add(&csv_path, "https://duckduckgo.com/", "Privacy match me search Engine", Some(vec!["c", "Engine"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google match me Search Engine",
+        Some(vec!["Search"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://bing.com",
+        "MS Search",
+        Some(vec!["search", "a"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://yahoo.com",
+        "Yahoo match me Engine",
+        Some(vec!["Search", "B"]),
+    )?;
+    setup_add(
+        &csv_path,
+        "https://duckduckgo.com/",
+        "Privacy match me search Engine",
+        Some(vec!["c", "Engine"]),
+    )?;
 
-    cmd.arg("tags").assert().success()
-        .stdout(predicate::eq("\
+    cmd.arg("tags").assert().success().stdout(predicate::eq(
+        "\
 a
 B
 c
 Engine
 Search, search
-"));
+",
+    ));
 
     Ok(())
 }
@@ -243,7 +385,12 @@ fn csv_not_in_git_root() -> Result<()> {
     init_repo_and_create_initial_commit(dir.path())?;
 
     // This will do its own assert
-    setup_add(&csv_path, "https://google.com", "Google match me Search Engine", Some(vec!["Search"]))?;
+    setup_add(
+        &csv_path,
+        "https://google.com",
+        "Google match me Search Engine",
+        Some(vec!["Search"]),
+    )?;
 
     Ok(())
 }
@@ -256,9 +403,9 @@ fn csv_not_in_git_repo() -> Result<()> {
     let mut cmd = setup_cmd(&csv_path)?;
 
     cmd.arg("a").arg("https://google.com").arg("Google");
-    cmd.assert()
-        .success()
-        .stdout(predicate::str::contains("It appears the CSV file is not in a git repo. Use --no-commit to suppress this message"));
+    cmd.assert().success().stdout(predicate::str::contains(
+        "It appears the CSV file is not in a git repo. Use --no-commit to suppress this message",
+    ));
 
     Ok(())
 }
@@ -281,7 +428,10 @@ fn fail_if_uncommitted_changes_in_git_rep() -> Result<()> {
 fn no_commit() -> Result<()> {
     let (csv_dir, _csv_path, mut cmd) = setup()?;
 
-    cmd.arg("a").arg("https://google.com").arg("Google").arg("--no-commit");
+    cmd.arg("a")
+        .arg("https://google.com")
+        .arg("Google")
+        .arg("--no-commit");
     cmd.assert().success();
 
     let repo = Repository::open(csv_dir.path())?;
@@ -353,14 +503,11 @@ fn setup_cmd(csv_path: &Path) -> Result<Command> {
 fn setup_add(csv_path: &Path, url: &str, description: &str, tags: Option<Vec<&str>>) -> Result<()> {
     let mut cmd = setup_cmd(csv_path)?;
 
-    cmd.arg("add")
-        .arg(url)
-        .arg(description);
+    cmd.arg("add").arg(url).arg(description);
 
     if let Some(tags) = tags {
         for tag in tags {
-            cmd.arg("--tag")
-                .arg(tag);
+            cmd.arg("--tag").arg(tag);
         }
     }
 
@@ -377,8 +524,12 @@ fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<
 
     let num_matches = &stdout.lines().count();
 
-    ensure!(num_matches == &expected_num_matches,
-        "Unexpected number of matches [{}]: {}", num_matches, stdout);
+    ensure!(
+        num_matches == &expected_num_matches,
+        "Unexpected number of matches [{}]: {}",
+        num_matches,
+        stdout
+    );
 
     Ok(())
 }
@@ -386,7 +537,10 @@ fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<
 /// Handy utility method for printing out the current git status
 #[allow(dead_code)]
 fn debug_git_status(csv_path: &Path) -> Result<()> {
-    let git_output = Command::new("/usr/local/bin//git").arg("status").current_dir(csv_path.parent().unwrap()).output()?;
+    let git_output = Command::new("/usr/local/bin//git")
+        .arg("status")
+        .current_dir(csv_path.parent().unwrap())
+        .output()?;
     let git_stdout = std::str::from_utf8(&*git_output.stdout).unwrap();
     println!("GIT STATUS =\n{}", git_stdout);
     Ok(())

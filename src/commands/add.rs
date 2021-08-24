@@ -1,9 +1,9 @@
 use anyhow::Result;
 use validator::Validate;
 
-use crate::cli_output::utils::{print_success, exit_error};
+use crate::cli_output::utils::{exit_error, print_success};
 use crate::config::Add;
-use crate::csv::{CsvLineReader, CsvLineWriter, create_csv};
+use crate::csv::{create_csv, CsvLineReader, CsvLineWriter};
 use crate::git::Git;
 
 pub fn add(add_opts: &Add, csv: &str) -> Result<()> {
@@ -39,10 +39,7 @@ pub fn add(add_opts: &Add, csv: &str) -> Result<()> {
     )?;
 
     if let Some(git) = &git {
-        git.add_and_commit_bookmark(
-            add_opts.url.as_str(),
-            add_opts.description.as_str(),
-        )?;
+        git.add_and_commit_bookmark(add_opts.url.as_str(), add_opts.description.as_str())?;
     }
 
     // Success

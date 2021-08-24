@@ -1,6 +1,6 @@
-use anyhow::{Result, Context};
+use anyhow::{Context, Result};
+use std::fs::{File, OpenOptions};
 use std::io::Write;
-use std::fs::{OpenOptions, File};
 
 pub struct CsvLineWriter {
     file: File,
@@ -14,9 +14,7 @@ impl CsvLineWriter {
             .open(&csv)
             .context("Could not open CSV for writing")?;
 
-        Ok(Self {
-            file,
-        })
+        Ok(Self { file })
     }
 
     pub fn write_line(&mut self, url: &str, description: &str, tags: &[String]) -> Result<()> {

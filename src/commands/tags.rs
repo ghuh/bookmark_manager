@@ -1,7 +1,7 @@
 use crate::config::Tags;
 
-use anyhow::Result;
 use crate::csv::CsvLineReader;
+use anyhow::Result;
 use std::collections::HashMap;
 
 pub fn tags(_tags_opts: &Tags, csv: &str) -> Result<()> {

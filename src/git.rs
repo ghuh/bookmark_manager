@@ -1,7 +1,7 @@
-use std::path::Path;
-use git2::{Repository, ObjectType, Commit, IndexAddOption};
-use anyhow::{Result, Context};
 use crate::cli_output::utils::print_warning;
+use anyhow::{Context, Result};
+use git2::{Commit, IndexAddOption, ObjectType, Repository};
+use std::path::Path;
 
 pub struct Git {
     repo: Repository,
@@ -32,7 +32,10 @@ impl Git {
     }
 
     pub fn is_clean(&self) -> Result<bool> {
-        let statuses = self.repo.statuses(None).context("Could not get git status")?;
+        let statuses = self
+            .repo
+            .statuses(None)
+            .context("Could not get git status")?;
         // https://github.com/rust-lang/git2-rs/blob/master/examples/status.rs#L174
         let is_dirty = statuses.iter().any(|e| e.status() != git2::Status::CURRENT);
 
@@ -78,6 +81,7 @@ impl Git {
 
     fn find_last_commit(&self) -> Result<Commit, git2::Error> {
         let obj = self.repo.head()?.resolve()?.peel(ObjectType::Commit)?;
-        obj.into_commit().map_err(|_| git2::Error::from_str("Couldn't find last commit"))
+        obj.into_commit()
+            .map_err(|_| git2::Error::from_str("Couldn't find last commit"))
     }
 }
