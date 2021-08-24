@@ -16,6 +16,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
+    # Needed for integration tests to pass because the script uses the global git values for creating commits
+    - run: |
+        git config --global user.name test_user
+        git config --global user.email test@config.com
     - name: Install minimal stable with clippy and rustfmt
       uses: actions-rs/toolchain@v1
       with:
