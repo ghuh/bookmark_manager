@@ -1,7 +1,7 @@
-use clap::Clap;
+use clap::Parser;
 use validator::{Validate, ValidationError};
 
-#[derive(Debug, Clap)]
+#[derive(Debug, Parser)]
 #[clap(name = "bm", about = "Bookmark Manager CLI")]
 pub struct Opts {
     #[clap(subcommand)]
@@ -10,7 +10,7 @@ pub struct Opts {
 
 // subcommands: https://github.com/TeXitoi/structopt/blob/master/examples/enum_tuple.rs
 // aliases: https://github.com/TeXitoi/structopt/blob/master/examples/subcommand_aliases.rs
-#[derive(Debug, Clap)]
+#[derive(Debug, Parser)]
 pub enum Command {
     /// Add a bookmark to the bookmarks file
     #[clap(name = "add", alias = "a")]
@@ -25,7 +25,7 @@ pub enum Command {
     Tags(Tags),
 }
 
-#[derive(Debug, Clap, Validate)]
+#[derive(Debug, Parser, Validate)]
 pub struct Add {
     /// URL to bookmark
     #[validate(url, custom = "validate_no_pipe")]
@@ -48,7 +48,7 @@ pub struct Add {
     pub commit: bool,
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, Parser)]
 pub struct Search {
     /// Perl style REGEX to run against bookmark URL and description.  Omit to do tags only search.
     pub regex: Option<String>,
@@ -60,7 +60,7 @@ pub struct Search {
     pub tags: Vec<String>,
 }
 
-#[derive(Debug, Clap)]
+#[derive(Debug, Parser)]
 pub struct Tags {}
 
 fn validate_tags(values: &[String]) -> std::result::Result<(), ValidationError> {

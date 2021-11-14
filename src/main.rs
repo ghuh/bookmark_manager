@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::Clap;
+use clap::Parser;
 use std::env;
 
 use crate::cli_output::utils::exit_error;
