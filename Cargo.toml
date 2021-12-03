@@ -1,7 +1,7 @@
 [package]
 name = "bm"
 version = "1.0.0"
-edition = "2018"
+edition = "2021"
 authors = ["kphayen <kphayen@gmail.com>"]
 publish = false
 
