@@ -43,7 +43,7 @@ impl Git {
     }
 
     pub fn add_and_commit_bookmark(&self, url: &str, description: &str) -> Result<()> {
-        self.add_and_commit(format!("Add bookmark for {} - {}", url, description).as_str())?;
+        self.add_and_commit(format!("Add bookmark for {url} - {description}").as_str())?;
         Ok(())
     }
 

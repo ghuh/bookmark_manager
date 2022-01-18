@@ -45,7 +45,7 @@ fn parse_line(line: &str) -> Result<Line> {
     let line_parts = line.split('|').collect::<Vec<&str>>();
     ensure!(
         line_parts.len() == 3,
-        format!("CSV line has more than 3 columns: {}", line)
+        format!("CSV line has more than 3 columns: {line}")
     );
 
     let url = String::from(line_parts[0]);
