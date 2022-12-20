@@ -462,7 +462,7 @@ fn setup() -> Result<(TempDir, PathBuf, Command)> {
 /// Unlike regular "git init", this example shows how to create an initial empty
 /// commit in the repository. This is the helper function that does that.
 fn init_repo_and_create_initial_commit(git_repo_path: &Path) -> Result<(), git2::Error> {
-    let repo = Repository::init(&git_repo_path)?;
+    let repo = Repository::init(git_repo_path)?;
 
     // First use the config to initialize a commit signature for the user.
     let sig = repo.signature()?;
@@ -520,7 +520,7 @@ fn test_count_matches(cmd: &mut Command, expected_num_matches: usize) -> Result<
     let assert = cmd.assert().success();
 
     // https://stackoverflow.com/questions/19076719/how-do-i-convert-a-vector-of-bytes-u8-to-a-string
-    let stdout = std::str::from_utf8(&*assert.get_output().stdout).unwrap();
+    let stdout = std::str::from_utf8(&assert.get_output().stdout).unwrap();
 
     let num_matches = &stdout.lines().count();
 
@@ -541,7 +541,7 @@ fn debug_git_status(csv_path: &Path) -> Result<()> {
         .arg("status")
         .current_dir(csv_path.parent().unwrap())
         .output()?;
-    let git_stdout = std::str::from_utf8(&*git_output.stdout).unwrap();
+    let git_stdout = std::str::from_utf8(&git_output.stdout).unwrap();
     println!("GIT STATUS =\n{}", git_stdout);
     Ok(())
 }

@@ -19,7 +19,8 @@ const ENV_CSV: &str = "BOOKMARK_MANAGER_CSV";
 fn main() -> Result<()> {
     let opt = config::Opts::parse();
 
-    let csv = env::var(ENV_CSV).expect(&*format!("Environmental variable {ENV_CSV} must be set"));
+    let csv = env::var(ENV_CSV)
+        .unwrap_or_else(|_| panic!("Environmental variable {ENV_CSV} must be set"));
 
     // The add command will create the CSV, the others will fail if it does not exit
     if let Command::Add(_) = opt.cmd {

@@ -11,7 +11,7 @@ impl CsvLineWriter {
         let file = OpenOptions::new()
             .write(true)
             .append(true)
-            .open(&csv)
+            .open(csv)
             .context("Could not open CSV for writing")?;
 
         Ok(Self { file })
