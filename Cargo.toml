@@ -14,7 +14,7 @@ anyhow = "1.0.42"
 ansi_term = "0.12.1"
 regex = "1.5.4"
 validator = { version = "0.14.0", features = ["derive"] }
-git2 = "0.13.21"
+git2 = "0.15"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
