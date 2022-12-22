@@ -156,7 +156,7 @@ All these steps need to pass otherwise the [CI build](.github/workflows/ci.yaml)
 
 ```bash
 # To keep a clean build, fail on any compiler warnings, not just errors
-cargo clippy --all-targets --all-features -- -D warnings
+cargo clippy --workspace --all-targets --all-features -- --deny warnings
 cargo test
 cargo fmt
 cargo build --release
