@@ -542,7 +542,7 @@ fn debug_git_status(csv_path: &Path) -> Result<()> {
         .current_dir(csv_path.parent().unwrap())
         .output()?;
     let git_stdout = std::str::from_utf8(&git_output.stdout).unwrap();
-    println!("GIT STATUS =\n{}", git_stdout);
+    println!("GIT STATUS =\n{git_stdout}");
     Ok(())
 }
 
@@ -550,6 +550,6 @@ fn debug_git_status(csv_path: &Path) -> Result<()> {
 #[allow(dead_code)]
 fn debug_csv_file(csv_path: &Path) -> Result<()> {
     let contents = std::fs::read_to_string(csv_path)?;
-    println!("CSV FILE CONTENTS =\n{}", contents);
+    println!("CSV FILE CONTENTS =\n{contents}");
     Ok(())
 }
