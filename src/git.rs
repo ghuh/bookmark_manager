@@ -37,7 +37,9 @@ impl Git {
             .statuses(None)
             .context("Could not get git status")?;
         // https://github.com/rust-lang/git2-rs/blob/master/examples/status.rs#L174
-        let is_dirty = statuses.iter().any(|e| e.status() != git2::Status::CURRENT);
+        let is_dirty = statuses
+            .iter()
+            .any(|e| e.status() != git2::Status::CURRENT && e.status() != git2::Status::IGNORED);
 
         Ok(!is_dirty)
     }

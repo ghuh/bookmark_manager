@@ -3,6 +3,7 @@
 //   https://medium.com/@ericdreichert/how-to-print-during-rust-tests-619bdc7ccebc
 
 use assert_cmd::prelude::*;
+use std::fs;
 // Add methods on commands
 use predicates::prelude::*;
 // Used for writing assertions
@@ -420,6 +421,24 @@ fn fail_if_uncommitted_changes_in_git_rep() -> Result<()> {
     cmd.assert()
         .failure()
         .stderr(predicate::str::contains("Git repo has uncommitted changes"));
+
+    Ok(())
+}
+
+#[test]
+fn do_not_fail_if_ignored_file_in_git_rep() -> Result<()> {
+    let (csv_dir, _csv_path, mut cmd) = setup()?;
+
+    // Create an ignored file
+    // Can't use .gitignore because then it needs to be commited so use exclude instead
+    // https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#excluding-local-files-without-creating-a-gitignore-file
+    fs::write(csv_dir.path().join(".git/info/exclude"), "ignored_file")?;
+    File::create(csv_dir.path().join("ignored_file"))?;
+
+    cmd.arg("a").arg("https://google.com").arg("Google");
+    cmd.assert()
+        .success()
+        .stdout(predicate::str::contains("CSV file created"));
 
     Ok(())
 }
