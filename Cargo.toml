@@ -18,5 +18,5 @@ git2 = "0.18.1"
 
 [dev-dependencies]
 assert_cmd = "2.0.0"
-predicates = "2.0.1"
+predicates = "3.0.3"
 tempfile = "3.2.0"
