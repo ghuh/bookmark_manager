@@ -9,7 +9,6 @@ pub struct CsvLineWriter {
 impl CsvLineWriter {
     pub fn new(csv: &str) -> Result<Self> {
         let file = OpenOptions::new()
-            .write(true)
             .append(true)
             .open(csv)
             .context("Could not open CSV for writing")?;

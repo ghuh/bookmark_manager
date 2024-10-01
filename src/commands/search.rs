@@ -212,7 +212,7 @@ mod tests {
 
     #[test]
     fn single_word_url() {
-        // Multi word doesn't make sense for a URL
+        // Multi-word doesn't make sense for a URL
         let m = match_line(
             &regex_from_str("google"),
             &Vec::new(),
@@ -355,14 +355,14 @@ mod tests {
         assert!(m.is_some());
         let matched_text = get_matched_parts(&m.unwrap().description);
         assert_eq!(matched_text.len(), 1);
-        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+        assert_eq!(matched_text.first().unwrap().text(), expected_text);
     }
 
     fn single_matched_url(m: Option<MatchedBookmark>, expected_text: &str) {
         assert!(m.is_some());
         let matched_text = get_matched_parts(&m.unwrap().url);
         assert_eq!(matched_text.len(), 1);
-        assert_eq!(matched_text.get(0).unwrap().text(), expected_text);
+        assert_eq!(matched_text.first().unwrap().text(), expected_text);
     }
 
     fn get_matched_parts(parts: &[TextPart]) -> Vec<TextPart> {
