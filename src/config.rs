@@ -56,7 +56,12 @@ pub struct Search {
 }
 
 #[derive(Debug, Parser)]
-pub struct Tags {}
+pub struct Tags {
+    /// Output tags in a machine-readable way. i.e. Every tag is on a new line.
+    /// Defaults to false which outputs in a more human-readable way. i.e. Different capitalization of the same tag is output comma separated on the same line
+    #[clap(long = "machine", action = clap::ArgAction::SetTrue)]
+    pub machine: bool,
+}
 
 fn validate_tags(values: &[String]) -> std::result::Result<(), ValidationError> {
     for val in values {

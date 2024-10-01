@@ -4,7 +4,7 @@ use crate::csv::CsvLineReader;
 use anyhow::Result;
 use std::collections::HashMap;
 
-pub fn tags(_tags_opts: &Tags, csv: &str) -> Result<()> {
+pub fn tags(tags_opts: &Tags, csv: &str) -> Result<()> {
     let map = get_tags(csv)?;
 
     let mut keys = map.keys().collect::<Vec<&String>>();
@@ -14,7 +14,11 @@ pub fn tags(_tags_opts: &Tags, csv: &str) -> Result<()> {
         if let Some(tags) = value {
             let mut tags = tags.clone();
             tags.sort();
-            println!("{}", tags.join(", "));
+            if tags_opts.machine {
+                tags.iter().for_each(|tag| println!("{tag}"));
+            } else {
+                println!("{}", tags.join(", "));
+            }
         }
     }
 
