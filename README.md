@@ -115,6 +115,14 @@ bm t
 bm t |grep "query"
 ```
 
+#### Bash Completions
+
+In your bashrc file, `source` `tool/bm_completions.bash` to get fzf completions for tags
+
+```bash
+# Example searching for a tag using fzf (Assuming $FZF_COMPLETION_TRIGGER is **)
+bm s -t **<tab>
+```
 
 ## Migrating from browser based bookmark managers
 
