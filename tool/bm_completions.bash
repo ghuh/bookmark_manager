@@ -1,21 +1,48 @@
 #!/usr/bin/env bash
 
+# Tab complete tags
+function _tab_complete_bm()
+{
+  latest="${COMP_WORDS[$COMP_CWORD]}"
+  prev="${COMP_WORDS[$COMP_CWORD - 1]}"
+  words=""
+  case "${prev}" in
+    --tag | -t)
+      words=$(bm tags --machine)
+      ;;
+    *)
+      ;;
+  esac
+  COMPREPLY=( $(compgen -W "$words" -- "$latest") )
+  return 0
+}
+
 # Add completions using fzf if it is installed
 if type fzf &>/dev/null; then
   # Allow `bm s -t **<tab>` to complete the tag with fzf
   # Reference: https://thevaluable.dev/fzf-shell-integration/
   _fzf_complete_bm() {
-    # Only complete for the tag option
-    # https://stackoverflow.com/a/1854031
-    LAST="${*: -1}"
-    if [[ $LAST == '--tag' ]] || [[ $LAST == "-t" ]]; then
-      _fzf_complete -- "$@" < <(
-        bm tags --machine
-      )
+    cur="${COMP_WORDS[$COMP_CWORD]}"
+    prev="${COMP_WORDS[$COMP_CWORD - 1]}"
+    trigger=${FZF_COMPLETION_TRIGGER-'**'}
+    if [[ $prev == '--tag' ]] || [[ $prev == "-t" ]]; then
+      # From `fzf --bash`, check if the fzf trigger is being used and then complete with fzf
+      # Otherwise, fall back to normal tab completion
+      # shellcheck disable=SC2016
+      if [[ "$cur" == *"$trigger" ]] && [[ $cur != *'$('* ]] && [[ $cur != *':='* ]] && [[ $cur != *'`'* ]]; then
+        _fzf_complete -- "$@" < <(
+          bm tags --machine
+        )
+      else
+        _tab_complete_bm "$@"
+      fi
     fi
   }
 
   # Tell fzf to run for the bm command
   # Discovered this was necessary by running `fzf --bash|less` and reading how it works towards the bottom
   __fzf_defc "bm" _fzf_complete_bm "-o default -o bashdefault"
+else
+  # If fzf isn't installed, still do regular tab completion
+  complete -F _tab_complete_bm bm
 fi

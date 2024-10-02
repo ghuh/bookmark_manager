@@ -117,9 +117,14 @@ bm t |grep "query"
 
 #### Bash Completions
 
-In your bashrc file, `source` `tool/bm_completions.bash` to get fzf completions for tags
+In your bashrc file, `source` `tool/bm_completions.bash` to get tab completions for tabs.
+
+If [fzf](https://github.com/junegunn/fzf) is installed, tags can also be completed using standard `fzf` trigger tab completion.
 
 ```bash
+# Example of normal tab completion
+bm s -t <tab>
+
 # Example searching for a tag using fzf (Assuming $FZF_COMPLETION_TRIGGER is **)
 bm s -t **<tab>
 ```
