@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # Tab complete tags
+# Example: https://www.baeldung.com/linux/shell-auto-completion#3-sample-function
 function _tab_complete_bm()
 {
   latest="${COMP_WORDS[$COMP_CWORD]}"
@@ -13,6 +14,7 @@ function _tab_complete_bm()
     *)
       ;;
   esac
+  # shellcheck disable=SC2207
   COMPREPLY=( $(compgen -W "$words" -- "$latest") )
   return 0
 }
