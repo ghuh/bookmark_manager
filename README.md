@@ -20,17 +20,13 @@ The intention is that the CSV file is stored in Git/SCM, and it can be synced be
 
 The "CSV" file is actually `|` separated with 3 columns: URL, DESCRIPTION, and TAGS.  The TAGS column contains a comma separated list.
 
-## Installing
-
-TODO [Create brew formula](https://docs.brew.sh/Adding-Software-to-Homebrew) and include install instructions here
+## Setup/Install
 
 ```bash
 # If not using the --no-commit option, it will use the default user/email for creating commits when new bookmarks are added
 git config --global user.name <name>
 git config --global user.email <email>
 ```
-
-### From source
 
 Requires [installing Rust](https://www.rust-lang.org/tools/install).
 
