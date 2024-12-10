@@ -15,7 +15,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     # https://github.com/actions/checkout#push-a-commit-using-the-built-in-token
     # Needed for integration tests to pass because the script uses the global git values for creating commits
     - run: |
