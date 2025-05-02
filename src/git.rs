@@ -15,7 +15,9 @@ impl Git {
         let repo = loop {
             match dir.parent() {
                 None => {
-                    print_warning("It appears the CSV file is not in a git repo. Use --no-commit to suppress this message");
+                    print_warning(
+                        "It appears the CSV file is not in a git repo. Use --no-commit to suppress this message",
+                    );
                     return None;
                 }
                 Some(new_dir) => {

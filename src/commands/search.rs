@@ -1,4 +1,4 @@
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 use regex::{Regex, RegexBuilder};
 
 use crate::cli_output::search_result_output::{MatchedBookmark, SearchResultOutput, TextPart};

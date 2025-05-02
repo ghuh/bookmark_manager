@@ -3,7 +3,7 @@ use validator::Validate;
 
 use crate::cli_output::utils::{exit_error, print_success};
 use crate::config::Add;
-use crate::csv::{create_csv, CsvLineReader, CsvLineWriter};
+use crate::csv::{CsvLineReader, CsvLineWriter, create_csv};
 use crate::git::Git;
 
 pub fn add(add_opts: &Add, csv: &str) -> Result<()> {

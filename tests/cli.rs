@@ -9,12 +9,12 @@ use predicates::prelude::*;
 // Used for writing assertions
 use std::process::Command;
 // Run programs
-use anyhow::{ensure, Result};
+use anyhow::{Result, ensure};
 use git2::Repository;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
-use tempfile::{tempdir, TempDir};
+use tempfile::{TempDir, tempdir};
 
 const HEADER_ROW: &str = "URL|DESCRIPTION|TAGS";
 

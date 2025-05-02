@@ -1,10 +1,10 @@
 [package]
 name = "bm"
 version = "1.0.0"
-edition = "2021"
+edition = "2024"
 authors = ["kphayen <kphayen@gmail.com>"]
 publish = false
-rust-version = "1.58"
+rust-version = "1.86"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
