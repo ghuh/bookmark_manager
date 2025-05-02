@@ -28,16 +28,16 @@ pub enum Command {
 #[derive(Debug, Parser, Validate)]
 pub struct Add {
     /// URL to bookmark
-    #[validate(url, custom = "validate_no_pipe")]
+    #[validate(url, custom(function = "validate_no_pipe"))]
     pub url: String,
 
     /// Description of the URL
-    #[validate(custom = "validate_no_pipe")]
+    #[validate(custom(function = "validate_no_pipe"))]
     pub description: String,
 
     /// Tags to group bookmarks
     #[clap(short, long = "tag")]
-    #[validate(custom = "validate_tags")]
+    #[validate(custom(function = "validate_tags"))]
     pub tags: Vec<String>,
 
     /// Turn off automatically committing bookmarks file if it is in a git repo

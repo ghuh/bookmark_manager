@@ -13,7 +13,7 @@ clap = { version = "4", features = ["derive"] }
 anyhow = "1.0.42"
 ansi_term = "0.12.1"
 regex = "1.5.4"
-validator = { version = "0.16", features = ["derive"] }
+validator = { version = "0.20", features = ["derive"] }
 git2 = "0.18.1"
 
 [dev-dependencies]
