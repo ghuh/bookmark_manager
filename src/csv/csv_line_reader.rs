@@ -26,10 +26,7 @@ impl Iterator for CsvLineReader {
     type Item = Result<Line>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let line_result = match self.lines.next() {
-            Some(result) => result,
-            None => return None,
-        };
+        let line_result = self.lines.next()?;
 
         let line = match line_result.context("Could not read line from CSV") {
             Ok(line) => line,
