@@ -46,6 +46,7 @@ if type fzf &>/dev/null && type __fzf_defc &>/dev/null; then
   __fzf_defc "bm" _fzf_complete_bm "-o default -o bashdefault"
 else
   # Only give installation errors during interactive shells so it doesn't mess up things like ssh
+  #   https://serverfault.com/a/146747
   if type fzf &>/dev/null && [[ $- == *i* ]]; then
       echo "ERROR CONFIGURING BM: It looks like fzf is installed but it wasn't initialized before bm so bm/fzf integration not setup.  Initialize fzf before BM in your bashrc."
   fi
