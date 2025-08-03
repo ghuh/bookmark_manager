@@ -20,7 +20,7 @@ function _tab_complete_bm()
 }
 
 # Add completions using fzf if it is installed
-if type fzf &>/dev/null; then
+if type fzf &>/dev/null && type __fzf_defc &>/dev/null; then
   # Allow `bm s -t **<tab>` to complete the tag with fzf
   # Reference: https://thevaluable.dev/fzf-shell-integration/
   _fzf_complete_bm() {

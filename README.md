@@ -115,6 +115,8 @@ bm t |grep "query"
 
 In your bashrc file, `source` `tool/bm_completions.bash` to get tab completions for tabs.
 
+To get `fzf` integration, must be added to bashrc after `eval "$(fzf --bash)"` is called for `fzf` setup.
+
 If [fzf](https://github.com/junegunn/fzf) is installed, tags can also be completed using standard `fzf` trigger tab completion.
 
 ```bash
