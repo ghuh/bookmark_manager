@@ -83,7 +83,7 @@ impl Git {
         Ok(())
     }
 
-    fn find_last_commit(&self) -> Result<Commit, git2::Error> {
+    fn find_last_commit(&self) -> Result<Commit<'_>, git2::Error> {
         let obj = self.repo.head()?.resolve()?.peel(ObjectType::Commit)?;
         obj.into_commit()
             .map_err(|_| git2::Error::from_str("Couldn't find last commit"))
